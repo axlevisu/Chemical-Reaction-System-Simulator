@@ -28,7 +28,8 @@ O = [[0,1,3],[1,1,1]]
 u = [1,1]
 X_init = [0.5,0.25,0.25]
 param_init = [1,1]
-ts = 1000
+# Number of timesteps
+ts = 10000
 
 A = np.array(A)
 O = np.array(O)
@@ -41,6 +42,7 @@ X_init = np.array(X_init)
 if param_init is None:
 	theta = 1.0*np.ones(A.shape[0])/A.shape[1]
 else:
+	# Making sure sum of theta^A is 1 initially
 	theta = 1.0*param_init/np.sum(arraypow(param_init,A))
 
 if X_init is None:
@@ -51,23 +53,24 @@ if X_init is None:
 	X =  B.dot(u)
 	# k = np.random.uniform(0,-np.min(X0))
 else:
+	# Makes sure sum of X is 1
 	X = 1.0*X_init/sum(X_init)
 
-t = np.linspace(0, 200, ts)
+print "initial theta and X:"
+print theta, X
+
+t = np.linspace(0, 100, ts)
 # y0 = theta.tolist() + X.tolist()
 y0 = np.concatenate((theta,X))
 # y0 = (theta,X)
-print y0, Ok, A.dot(Ok)
-
 sol = odeint(ode, y0, t, args=(A,Ok))
 # Final theta and X
+y = sol[-1,:]
 theta = sol[-1,:A.shape[0]]
 X = sol[-1,A.shape[0]:]
-# Calcualting rates to check
-MprojReaction = A.dot(X - arraypow(theta,A))
-forward_rate = arraypow(theta,A.dot(Ok*(Ok <0)))
-backward_rate = arraypow(theta,A.dot(Ok*(Ok >0)))
-EProjReaction = Ok.dot(backward_rate*(arraypow(X,Ok*(Ok <0))) -  forward_rate*arraypow(X,Ok*(Ok >0))) 
+print "Final Theta and  X:"
 print theta,X
-print MprojReaction, EProjReaction
+# Print the rates to check
+print "Final rates of reactions:"
+print ode(y,t,A,Ok)
 
