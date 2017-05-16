@@ -7,3 +7,7 @@ Simulates Chemical Reaction System
 ## Running the code 
 Make suitable changes in "main.py" and then run the following command on terminal <br/>
 `Run python main.py`<br/>
+
+### Sample Plot generated
+
+![sample plot][sample_plot.png]

@@ -6,6 +6,7 @@ from scipy.integrate import odeint
 from fractions import Fraction
 
 def arraypow(x,A):
+	#Computes(\ theta^A)
 	return np.prod(x**(A.T),axis=-1)
 
 def ode(y,t,A,Ok):
@@ -89,3 +90,15 @@ print ode(y,t,A,Ok)
 Y = arraypow(theta,A)
 print "KL Divergence:"
 print np.sum(X*np.log(X/Y))
+params = A.shape[0];
+for i in range(sol.shape[1]):
+	if (i < params):
+		labeli = 'x' + str(i);
+		plt.plot(t, sol[:, i], label=labeli)
+	else :
+		labeli = 'theta' + str(i+1-params)
+		plt.plot(t, sol[:, i],label=labeli)
+plt.legend(loc='best')
+plt.xlabel('t')
+plt.grid()
+plt.show()
