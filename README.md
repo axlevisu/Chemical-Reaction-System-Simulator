@@ -10,4 +10,4 @@ Make suitable changes in "main.py" and then run the following command on termina
 
 ### Sample Plot generated
 
-![sample plot][sample_plot.png]
+![sample plot](sample_plot.png)
