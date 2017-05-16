@@ -82,10 +82,13 @@ theta = sol[-1,:A.shape[0]]
 X = sol[-1,A.shape[0]:]
 print "Final Theta and  X:"
 print theta,X
+
+print "MLD:"
+Y = arraypow(theta,A)
+print Y
 # Print the rates to check
 print "Final derivatives:"
 print ode(y,t,A,Ok)
 # Calculating KL - Divergence
-Y = arraypow(theta,A)
 print "KL Divergence:"
 print np.sum(X*np.log(X/Y))
