@@ -28,6 +28,12 @@ O = [[0,2,3],[1,1,1]]
 u = [1,1]
 X_init = [0.5,0.25,0.25]
 param_init = [1,1]
+# A = [[3,1,0,2],[0,2,3,1]]
+# O = [[1,1,0,0],[1,1,1,1]]
+# u = [1,1]
+# X_init = [0.3,0.2,0.1,0.4]
+# param_init = [1,1]
+
 # Number of timesteps
 ts = 10000
 
@@ -41,6 +47,7 @@ for basis in Ker:
 	l = lcm(map(lambda x: Fraction(x).denominator,map(str,basis)))
 	basis = map(int,l*basis)
 	Ok.append(basis)
+
 # Kernel basis are columns
 Ok = np.array(Ok).T
 ts = ts
@@ -88,6 +95,6 @@ X = sol[-1,A.shape[0]:]
 print "Final Theta and  X:"
 print theta,X
 # Print the rates to check
-print "Final rates of reactions:"
+print "Final derivatives:"
 print ode(y,t,A,Ok)
 
