@@ -93,10 +93,10 @@ print np.sum(X*np.log(X/Y))
 params = A.shape[0];
 for i in range(sol.shape[1]):
 	if (i < params):
-		labeli = 'x' + str(i);
+		labeli = 'theta' + str(i);
 		plt.plot(t, sol[:, i], label=labeli)
 	else :
-		labeli = 'theta' + str(i+1-params)
+		labeli = 'X' + str(i+1-params)
 		plt.plot(t, sol[:, i],label=labeli)
 plt.legend(loc='best')
 plt.xlabel('t')
