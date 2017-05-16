@@ -14,9 +14,9 @@ def ode(y,t,A,Ok):
 	# theta,X = y
 	# print y
 	MprojReaction = A.dot(X - arraypow(theta,A))
-	forward_rate = arraypow(theta,A.dot(Ok*(Ok <0)))
-	backward_rate = arraypow(theta,A.dot(Ok*(Ok >0)))
-	EProjReaction = Ok.dot(backward_rate*(arraypow(X,Ok*(Ok <0))) -  forward_rate*arraypow(X,Ok*(Ok >0))) 
+	forward_rate = arraypow(theta,-1*A.dot(Ok*(Ok <0)))
+	backward_rate = arraypow(theta,-1*A.dot(Ok*(Ok >0)))
+	EProjReaction = Ok.dot(backward_rate*(arraypow(X,-Ok*(Ok <0))) -  forward_rate*arraypow(X,Ok*(Ok >0))) 
 	# print MprojReaction.tolist() + EProjReaction.tolist()
 	# return MprojReaction.tolist() + EProjReaction.tolist()
 	# print np.concatenate((MprojReaction,EProjReaction))
@@ -55,6 +55,15 @@ if X_init is None:
 else:
 	# Makes sure sum of X is 1
 	X = 1.0*X_init/sum(X_init)
+
+print "Design Matrix:"
+print A
+
+print "Observation Matrix:"
+print O
+
+print "Kernel Basis of O:"
+print Ok
 
 print "initial theta and X:"
 print theta, X
