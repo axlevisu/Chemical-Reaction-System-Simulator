@@ -85,4 +85,3 @@ print theta,X
 # Print the rates to check
 print "Final derivatives:"
 print ode(y,t,A,Ok)
-
