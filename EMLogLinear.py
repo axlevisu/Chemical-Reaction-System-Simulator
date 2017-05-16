@@ -6,7 +6,7 @@ from scipy.integrate import odeint
 
 def reduce_int(alist):
 	mul = 1
-	abs_list = abs(alist)
+	# abs_list = abs(alist)
 	for x in abs_list:
 		x = float(x - floor(x))
 		if x:

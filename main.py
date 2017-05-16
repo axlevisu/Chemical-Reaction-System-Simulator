@@ -3,7 +3,7 @@ import numpy as np
 from sympy import *
 import matplotlib.pyplot as plt
 from scipy.integrate import odeint
-
+from fractions import Fraction
 
 def arraypow(x,A):
 	return np.prod(x**(A.T),axis=-1)
@@ -24,7 +24,7 @@ def ode(y,t,A,Ok):
 
 # Give Model Here
 A = [[2,1,0],[0,1,2]]
-O = [[0,1,3],[1,1,1]]
+O = [[0,2,3],[1,1,1]]
 u = [1,1]
 X_init = [0.5,0.25,0.25]
 param_init = [1,1]
@@ -34,7 +34,15 @@ ts = 10000
 A = np.array(A)
 O = np.array(O)
 u = np.array(u)
-Ok = np.array(Matrix(O).nullspace()).T
+Ker = 1.0*np.array(Matrix(O).nullspace())
+# Making the entries in the kernel basis integers
+Ok=[]
+for basis in Ker: 
+	l = lcm(map(lambda x: Fraction(x).denominator,map(str,basis)))
+	basis = map(int,l*basis)
+	Ok.append(basis)
+# Kernel basis are columns
+Ok = np.array(Ok).T
 ts = ts
 param_init = np.array(param_init)
 X_init = np.array(X_init)
