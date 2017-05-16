@@ -49,8 +49,8 @@ X_init = np.array(X_init)
 if param_init is None:
 	theta = 1.0*np.ones(A.shape[0])/A.shape[1]
 else:
-	# Making sure sum of theta^A is 1 initially
-	theta = 1.0*param_init/np.sum(arraypow(param_init,A))
+	# NOT NEEDED: Making sure sum of theta^A is 1 initially
+	theta = 1.0*param_init
 
 if X_init is None:
 	# This code is incomplete
@@ -85,3 +85,7 @@ print theta,X
 # Print the rates to check
 print "Final derivatives:"
 print ode(y,t,A,Ok)
+# Calculating KL - Divergence
+Y = arraypow(theta,A)
+print "KL Divergence:"
+print np.sum(X*np.log(X/Y))
