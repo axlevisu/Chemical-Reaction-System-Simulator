@@ -1,6 +1,8 @@
 # EM-Log Linear
 import numpy as np
 from sympy import *
+import matplotlib.pyplot as plt
+from scipy.integrate import odeint
 
 def reduce_int(alist):
 	mul = 1
