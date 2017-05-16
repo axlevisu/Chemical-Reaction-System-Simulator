@@ -1,60 +1,73 @@
-#Code for solving ode for  Chemical Reaction networks
-# Here we are trying to solve for the following CRN
-# We have the following reaction network
-
-# The second order differential equation for the angle `theta` of a
-# pendulum acted on by gravity with friction can be written::
-
-# theta''(t) + b*theta'(t) + c*sin(theta(t)) = 0
-
-# where `b` and `c` are positive constants, and a prime (') denotes a
-# derivative.  To solve this equation with `odeint`, we must first convert
-# it to a system of first order equations.  By defining the angular
-# velocity ``omega(t) = theta'(t)``, we obtain the system::
-
-# theta'(t) = omega(t)
-# omega'(t) = -b*omega(t) - c*sin(theta(t))
-
-# Let `y` be the vector [`theta`, `omega`].  We implement this system
-# in python as:
-
-import numpy as np 
+# EM-Log Linear
+import numpy as np
+from sympy import *
 import matplotlib.pyplot as plt
 from scipy.integrate import odeint
-def pend(y, t):
-    x1,x2,x3,theta1, theta2 = y
-    t1 = 2*(-theta1*(x1**2)*x3 + theta2*x2**3)
-    t2 = -3*(-theta1*(x1**2)*x3 + theta2*x2**3)
-    t3 = 1*(-theta1*(x1**2)*x3 + theta2*x2**3)
-    t4 = 2*(x1-(theta1**2)) + (x2 - theta1*theta2)
-    t5 = 2*(x3-(theta2**2)) + (x2 - theta1*theta2)
-    dydt = [t1,t2,t3,t4,t5]
-    return dydt
-# ...
 
-# We assume the constants are `b` = 0.25 and `c` = 5.0:
-# For initial conditions, we assume the pendulum is nearly vertical
-# with `theta(0)` = `pi` - 0.1, and it initially at rest, so
-# `omega(0)` = 0.  Then the vector of initial conditions is
 
-y0 = [0.5, 0.25,0.25,1,1]
+def arraypow(x,A):
+	return np.prod(x**(A.T),axis=-1)
 
-# We generate a solution 101 evenly spaced samples in the interval
-# 0 <= `t` <= 10.  So our array of times is:
+def ode(y,t,A,Ok):
+	# theta, X = np.array(y[:A.shape[0]]), np.array(y[A.shape[0]:])
+	theta,X = y[:A.shape[0]],y[A.shape[0]:]
+	# theta,X = y
+	# print y
+	MprojReaction = A.dot(X - arraypow(theta,A))
+	forward_rate = arraypow(theta,A.dot(Ok*(Ok <0)))
+	backward_rate = arraypow(theta,A.dot(Ok*(Ok >0)))
+	EProjReaction = Ok.dot(backward_rate*(arraypow(X,Ok*(Ok <0))) -  forward_rate*arraypow(X,Ok*(Ok >0))) 
+	# print MprojReaction.tolist() + EProjReaction.tolist()
+	# return MprojReaction.tolist() + EProjReaction.tolist()
+	# print np.concatenate((MprojReaction,EProjReaction))
+	return np.concatenate((MprojReaction,EProjReaction)).tolist()
 
-t = np.linspace(0, 1, 1000)
+# Give Model Here
+A = [[2,1,0],[0,1,2]]
+O = [[0,1,3],[1,1,1]]
+u = [1,1]
+X_init = [0.5,0.25,0.25]
+param_init = [1,1]
+ts = 1000
 
-# Call `odeint` to generate the solution.  To pass the parameters
-# `b` and `c` to `pend`, we give them to `odeint` using the `args`
-# argument.
+A = np.array(A)
+O = np.array(O)
+u = np.array(u)
+Ok = np.array(Matrix(O).nullspace()).T
+ts = ts
+param_init = np.array(param_init)
+X_init = np.array(X_init)
+# Normalizing the parameters
+if param_init is None:
+	theta = 1.0*np.ones(A.shape[0])/A.shape[1]
+else:
+	theta = 1.0*param_init/np.sum(arraypow(param_init,A))
 
-sol = odeint(pend, y0, t)
-plt.plot(t, sol[:, 0], 'b', label='x1')
-plt.plot(t, sol[:, 1], 'g', label='x2')
-plt.plot(t, sol[:, 2], 'r', label='x3')
-plt.plot(t, sol[:, 3], 'c', label='\theta1')
-plt.plot(t, sol[:, 4], 'm', label='\theta2')
-plt.legend(loc='best')
-plt.xlabel('t')
-plt.grid()
-plt.show()
+if X_init is None:
+	# This code is incomplete
+	# TODO: Add code here for an appropiate kernel element, use sympy for null space
+	# seed = np.random.normal(0,1)
+	B = np.linalg.pinv(O)
+	X =  B.dot(u)
+	# k = np.random.uniform(0,-np.min(X0))
+else:
+	X = 1.0*X_init/sum(X_init)
+
+t = np.linspace(0, 200, ts)
+# y0 = theta.tolist() + X.tolist()
+y0 = np.concatenate((theta,X))
+# y0 = (theta,X)
+print y0, Ok, A.dot(Ok)
+
+sol = odeint(ode, y0, t, args=(A,Ok))
+# Final theta and X
+theta = sol[-1,:A.shape[0]]
+X = sol[-1,A.shape[0]:]
+# Calcualting rates to check
+MprojReaction = A.dot(X - arraypow(theta,A))
+forward_rate = arraypow(theta,A.dot(Ok*(Ok <0)))
+backward_rate = arraypow(theta,A.dot(Ok*(Ok >0)))
+EProjReaction = Ok.dot(backward_rate*(arraypow(X,Ok*(Ok <0))) -  forward_rate*arraypow(X,Ok*(Ok >0))) 
+print theta,X
+print MprojReaction, EProjReaction
+

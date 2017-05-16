@@ -24,27 +24,50 @@ def reaction_eq(conc, coeff):
 	return eq
 
 
+def transpose(alist):
+	return map(list, zip(*alist))
+
+def arraypow(x,A):
+	return np.prod(x**(A.T),axis=-1)
+
 class EMLogLinear():
 	"""docstring for EMLogLinear"""
-	def __init__(self, A,O,u,param_init = None, X_init = None,ts = 0.001):
+	def __init__(self, A,O,u,param_init = None, X_init = None,ts = 1000):
 		# super(EMLogLinear, self).__init__()
 		self.A = np.array(A)
 		self.O = np.array(O)
 		self.u = np.array(u)
 		self.Ok = np.array(Matrix(O).nullspace())
+		self.ts = ts
+		param_init = np.array(param_init)
+		X_init = np.array(X_init)
+		# Normalizing the parameters
 		if param_init is None:
-			self.theta = np.ones(self.A.shape[0])
+			self.theta = 1.0*np.ones(self.A.shape[0])/self.A.shape[1]
 		else:
-			self.theta = param_init
+			self.theta = 1.0*param_init/np.sum(arraypow(param_init,self.A))
 		if X_init is None:
-			# TODO: Add code here for a appropiate kernel element, use sympy for null space
+			# This code is incomplete
+			# TODO: Add code here for an appropiate kernel element, use sympy for null space
 			# seed = np.random.normal(0,1)
 			B = np.linalg.pinv(self.O)
 			self.X =  B.dot(self.u)
 			# k = np.random.uniform(0,-np.min(self.X0))
 		else:
-			self.X = X_init				
+			self.X = 1.0*X_init/sum(X_init)
 
+	def ode(y,t):
+		theta, X = y 
+		MprojReaction = self.A.dot(X - arraypow(theta,self.A))
+		rate = arraypow(theta,self.A.dot(self.Ok))
+		EProjReaction = -self.Ok.dot( arraypow(X,self.Ok*(self.Ok >0)) - rate*(arraypow(X,self.Ok*(self.Ok <0))) ) 
+		return [MprojReaction,EProjReaction]
+
+	def solve(self):
+		t = np.linspace(0, 50, self.ts)
+		y0 = [self.theta, self.theta]
+		sol = odeint(ode, y0, t)
+		return sol[-1,:]
 	# def EProj():
 	# 	X0 = self.X
 	# 	q = self.theta**(self.A.T)
@@ -52,9 +75,12 @@ class EMLogLinear():
 
 def main():
 	A = [[2,1,0],[0,1,2]]
-	O = [[2,0,3],[1,1,1]]
-	u = [1.4,1]
-	model = EMLogLinear(A = A,O =O,u = u)
+	O = [[0,1,3],[1,1,1]]
+	u = [1,1]
+	X_init = [0.5,0.25,0.25]
+	param_init = [1,1]
+	model = EMLogLinear(A = A, O =O, u = u, X_init = X_init, param_init = param_init)
+	print model.solve()
 	return
 
 
