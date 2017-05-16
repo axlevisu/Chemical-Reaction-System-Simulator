@@ -33,7 +33,7 @@ class EMLogLinear():
 		self.u = np.array(u)
 		self.Ok = np.array(Matrix(O).nullspace())
 		if param_init is None:
-			self.theta = np.ones(A.shape[0])
+			self.theta = np.ones(self.A.shape[0])
 		else:
 			self.theta = param_init
 		if X_init is None:
@@ -45,9 +45,9 @@ class EMLogLinear():
 		else:
 			self.X = X_init				
 
-	def EProj():
-		X0 = self.X
-		q = self.theta**(self.A.T)
+	# def EProj():
+	# 	X0 = self.X
+	# 	q = self.theta**(self.A.T)
 		
 
 def main():
