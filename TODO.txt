@@ -1,0 +1,9 @@
+TODO:
+
+Complete EM algorithm
+
+Make it into a module
+
+(optional)Visualization
+
+Proving Global Convergence
