@@ -7,3 +7,5 @@ Make it into a module
 (optional)Visualization
 
 Proving Global Convergence
+
+Check for different initializations
