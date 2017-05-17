@@ -12,7 +12,7 @@ def ode(y,t,A,Ok):
 	theta,X = y[:A.shape[0]],y[A.shape[0]:]
 	MprojReaction = A.dot(X - arraypow(theta,A))
 	forward_rate = arraypow(theta,-1*A.dot(Ok*(Ok <0)))
-	backward_rate = arraypow(theta,-1*A.dot(Ok*(Ok >0)))
+	backward_rate = arraypow(theta,1*A.dot(Ok*(Ok >0)))
 	EProjReaction = Ok.dot(backward_rate*(arraypow(X,-Ok*(Ok <0))) -  forward_rate*arraypow(X,Ok*(Ok >0))) 
 	return np.concatenate((MprojReaction,EProjReaction)).tolist()
 
