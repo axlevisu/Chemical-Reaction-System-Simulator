@@ -19,7 +19,7 @@ def ode(y,t,A,Ok):
 
 # Give Model Here
 A = [[2,1,0],[0,1,2]]
-O = [[0,2,3],[1,1,1]]
+O = [[0,1,3],[1,1,1]]
 u = [1,1]
 X_init = [0.5,0.25,0.25]
 param_init = [1,1]
@@ -28,22 +28,29 @@ param_init = [1,1]
 # X_init = [0.3,0.2,0.1,0.4]
 
 # Number of timesteps
-ts = 10000
+ts = 50000
 
 A = np.array(A)
 O = np.array(O)
 u = np.array(u)
-Ker = 1.0*np.array(Matrix(O).nullspace())
+OKer = 1.0*np.array(Matrix(O).nullspace())
+AKer = 1.0*np.array(Matrix(A).nullspace())
 # Making the entries in the kernel basis integers
 Ok=[]
-for basis in Ker: 
+Ak=[]
+for basis in OKer: 
 	l = lcm(map(lambda x: Fraction(x).denominator,map(str,basis)))
 	basis = map(int,l*basis)
 	Ok.append(basis)
 
+for basis in AKer: 
+	l = lcm(map(lambda x: Fraction(x).denominator,map(str,basis)))
+	basis = map(int,l*basis)
+	Ak.append(basis)
+
 # Kernel basis are columns
 Ok = np.array(Ok).T
-ts = ts
+Ak = np.array(Ak).T
 param_init = np.array(param_init)
 X_init = np.array(X_init)
 # Normalizing the parameters
@@ -74,7 +81,10 @@ print Ok
 print "initial theta and X:"
 print theta, X
 
-t = np.linspace(0, 100, ts)
+print "u (equals OX_init):"
+print O.dot(X)
+
+t = np.linspace(0, 2000, ts)
 y0 = np.concatenate((theta,X))
 sol = odeint(ode, y0, t, args=(A,Ok))
 # Final theta and X
@@ -93,6 +103,15 @@ print ode(y,t,A,Ok)
 # Calculating KL - Divergence
 print "KL Divergence:"
 print np.sum(X*np.log(X/Y))
+print "OX (should be equal to u):"
+print O.dot(X)
+
+print "OY, Y is MLD"
+print O.dot(Y)
+
+print "X^Ak"
+print arraypow(X,Ak)
+
 params = A.shape[0];
 for i in range(sol.shape[1]):
 	if (i < params):
