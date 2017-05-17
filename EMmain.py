@@ -1,3 +1,4 @@
+# EMmain.py
 # EM-Log Linear
 import numpy as np
 from sympy import *
@@ -6,17 +7,24 @@ from scipy.integrate import odeint
 from fractions import Fraction
 
 def arraypow(x,A):
-	#Computes(\ theta^A)
 	return np.prod(x**(A.T),axis=-1)
 
-def ode(y,t,A,Ok):
-	theta,X = y[:A.shape[0]],y[A.shape[0]:]
-	MprojReaction = A.dot(X - arraypow(theta,A))
-	forward_rate = arraypow(theta,-1*A.dot(Ok*(Ok <0)))
-	backward_rate = arraypow(theta,1*A.dot(Ok*(Ok >0)))
+def EProj(y,t,Ok):
+	Y,X = y[:Ok.shape[0]],y[Ok.shape[0]:]
+	forward_rate = arraypow(Y,-Ok*(Ok <0))
+	backward_rate = arraypow(Y,Ok*(Ok >0))
 	EProjReaction = Ok.dot(backward_rate*(arraypow(X,-Ok*(Ok <0))) -  forward_rate*arraypow(X,Ok*(Ok >0))) 
-	return np.concatenate((MprojReaction,EProjReaction)).tolist()
+	# print EProjReaction
+	return [0.]*Ok.shape[0] + EProjReaction.tolist() 
 
+def MProj(y,t,Ak):
+	Y,X = y[:Ak.shape[0]],y[Ak.shape[0]:]
+	MprojReaction = Ak.dot( arraypow(X,-Ak*(Ak <0)) -  arraypow(X,Ak*(Ak >0)) )
+	# print MprojReaction
+	return MprojReaction.tolist() + [0.]*Ak.shape[0]
+
+def KLDiv(Y,X):
+	return np.sum(X*np.log(X/Y))
 # Give Model Here
 A = [[2,1,0],[0,1,2]]
 O = [[0,2,3],[1,1,1]]
@@ -33,16 +41,24 @@ ts = 10000
 A = np.array(A)
 O = np.array(O)
 u = np.array(u)
-Ker = 1.0*np.array(Matrix(O).nullspace())
+OKer = 1.0*np.array(Matrix(O).nullspace())
+AKer = 1.0*np.array(Matrix(A).nullspace())
 # Making the entries in the kernel basis integers
 Ok=[]
-for basis in Ker: 
+Ak=[]
+for basis in OKer: 
 	l = lcm(map(lambda x: Fraction(x).denominator,map(str,basis)))
 	basis = map(int,l*basis)
 	Ok.append(basis)
 
+for basis in AKer: 
+	l = lcm(map(lambda x: Fraction(x).denominator,map(str,basis)))
+	basis = map(int,l*basis)
+	Ak.append(basis)
+
 # Kernel basis are columns
 Ok = np.array(Ok).T
+Ak = np.array(Ak).T
 ts = ts
 param_init = np.array(param_init)
 X_init = np.array(X_init)
@@ -71,37 +87,41 @@ print O
 print "Kernel Basis of O:"
 print Ok
 
-print "initial theta and X:"
-print theta, X
+print "Kernel Basis of A:"
+print Ak
 
-t = np.linspace(0, 100, ts)
-y0 = np.concatenate((theta,X))
-sol = odeint(ode, y0, t, args=(A,Ok))
+
+t = np.linspace(0, 200, ts)
+Y = arraypow(theta,A)
+Y = Y/np.sum(Y)
+print "Starting point on toric ray:"
+print Y
+print "Starting point on affine space:"
+print X
+y0 = np.concatenate((Y,X))
+while(True):
+	sol = odeint(EProj, y0, t, args=(Ok,))
+	y = sol[-1,:]
+	if (y == y0).all():
+		break
+	print "After EProjection:"
+	print y,y0
+	y0 = y	
+	sol = odeint(MProj, y0, t,args = (Ak,))
+	y = sol[-1,:]		
+	print "After MProjection:"
+	print y,y0
+	if (y == y0).all():
+		break
+	y0 = y
+
 # Final theta and X
 y = sol[-1,:]
-theta = sol[-1,:A.shape[0]]
-X = sol[-1,A.shape[0]:]
-print "Final Theta and  X:"
-print theta,X
+Y = sol[-1,:A.shape[1]]
+X = sol[-1,O.shape[1]:]
+print "Final MLD and  X:"
+print Y,X
 
-print "MLD:"
-Y = arraypow(theta,A)
-print Y
-# Print the rates to check
-print "Final derivatives:"
-print ode(y,t,A,Ok)
 # Calculating KL - Divergence
 print "KL Divergence:"
-print np.sum(X*np.log(X/Y))
-params = A.shape[0];
-for i in range(sol.shape[1]):
-	if (i < params):
-		labeli = 'theta' + str(i);
-		plt.plot(t, sol[:, i], label=labeli)
-	else :
-		labeli = 'X' + str(i+1-params)
-		plt.plot(t, sol[:, i],label=labeli)
-plt.legend(loc='best')
-plt.xlabel('t')
-plt.grid()
-plt.show()
+print KLDiv(Y,X)

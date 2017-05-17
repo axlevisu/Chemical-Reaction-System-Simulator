@@ -3,29 +3,16 @@ import numpy as np
 from sympy import *
 import matplotlib.pyplot as plt
 from scipy.integrate import odeint
+from fractions import Fraction
 
-def reduce_int(alist):
-	mul = 1
-	# abs_list = abs(alist)
-	for x in abs_list:
-		x = float(x - floor(x))
-		if x:
-			mul *= Fraction(x).denominator
-	abs_list = [a*mul for a in abs_list]
-	gcd = reduce(lambda x,y: gcd([x,y]),abs_list)
-	mul = mul/gcd
-	alist = [1*mul for a in alist]
-	return alist
-
-def reaction_eq(conc, coeff):
-	eq = 1
-	for pair in transpose(conc):
-		eq *= float(pair[0])**pair[1]
-	return eq
-
-
-def transpose(alist):
-	return map(list, zip(*alist))
+# TODO: Possible to make tham member functions?
+def ode(y,t,A,Ok):
+	theta,X = y[:A.shape[0]],y[A.shape[0]:]
+	MprojReaction = A.dot(X - arraypow(theta,A))
+	forward_rate = arraypow(theta,-1*A.dot(Ok*(Ok <0)))
+	backward_rate = arraypow(theta,-1*A.dot(Ok*(Ok >0)))
+	EProjReaction = Ok.dot(backward_rate*(arraypow(X,-Ok*(Ok <0))) -  forward_rate*arraypow(X,Ok*(Ok >0))) 
+	return np.concatenate((MprojReaction,EProjReaction)).tolist()
 
 def arraypow(x,A):
 	return np.prod(x**(A.T),axis=-1)
@@ -37,7 +24,16 @@ class EMLogLinear():
 		self.A = np.array(A)
 		self.O = np.array(O)
 		self.u = np.array(u)
-		self.Ok = np.array(Matrix(O).nullspace())
+		Ker = 1.0*np.array(Matrix(O).nullspace())
+		# Making the entries in the kernel basis integers
+		self.Ok=[]
+		for basis in Ker: 
+			l = lcm(map(lambda x: Fraction(x).denominator,map(str,basis)))
+			basis = map(int,l*basis)
+			self.Ok.append(basis)
+
+		# Kernel basis are columns
+		self.Ok = np.array(self.Ok).T
 		self.ts = ts
 		param_init = np.array(param_init)
 		X_init = np.array(X_init)
@@ -45,42 +41,43 @@ class EMLogLinear():
 		if param_init is None:
 			self.theta = 1.0*np.ones(self.A.shape[0])/self.A.shape[1]
 		else:
-			self.theta = 1.0*param_init/np.sum(arraypow(param_init,self.A))
+			# NOT NEEDED: Making sure sum of theta^A is 1 initially
+			self.theta = 1.0*param_init		
 		if X_init is None:
 			# This code is incomplete
 			# TODO: Add code here for an appropiate kernel element, use sympy for null space
-			# seed = np.random.normal(0,1)
 			B = np.linalg.pinv(self.O)
-			self.X =  B.dot(self.u)
-			# k = np.random.uniform(0,-np.min(self.X0))
+			self.X =  B.dot(self.u) # TODO: Add a vector from the nullspace and make sure X is positive
 		else:
+			# Makes sure sum of X is 1
 			self.X = 1.0*X_init/sum(X_init)
-
-	def ode(y,t):
-		theta, X = y 
-		MprojReaction = self.A.dot(X - arraypow(theta,self.A))
-		rate = arraypow(theta,self.A.dot(self.Ok))
-		EProjReaction = -self.Ok.dot( arraypow(X,self.Ok*(self.Ok >0)) - rate*(arraypow(X,self.Ok*(self.Ok <0))) ) 
-		return [MprojReaction,EProjReaction]
 
 	def solve(self):
 		t = np.linspace(0, 50, self.ts)
-		y0 = [self.theta, self.theta]
-		sol = odeint(ode, y0, t)
-		return sol[-1,:]
-	# def EProj():
-	# 	X0 = self.X
-	# 	q = self.theta**(self.A.T)
-		
+		y0 = np.concatenate((self.theta,self.X))
+		sol = odeint(ode, y0, t, args=(self.A,self.Ok))
+		self.theta = np.array(sol[-1,:self.A.shape[0]])
+		self.X = sol[-1,self.A.shape[0]:]
+		return self.theta, self.X
 
+	def divergence(self):
+		Y = arraypow(self.theta,self.A)
+		return np.sum(X*np.log(X/Y))
+
+	def observation_kernel(self):
+		return self.Ok
+
+	
 def main():
 	A = [[2,1,0],[0,1,2]]
-	O = [[0,1,3],[1,1,1]]
+	O = [[0,2,3],[1,1,1]]
 	u = [1,1]
 	X_init = [0.5,0.25,0.25]
 	param_init = [1,1]
 	model = EMLogLinear(A = A, O =O, u = u, X_init = X_init, param_init = param_init)
-	print model.solve()
+	final_theta, final_X = model.solve()
+	print final_theta
+	print final_X
 	return
 
 
