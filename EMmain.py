@@ -21,14 +21,14 @@ def MProj(y,t,Ak):
 	Y,X = y[:Ak.shape[0]],y[Ak.shape[0]:]
 	MprojReaction = Ak.dot( arraypow(X,-Ak*(Ak <0)) -  arraypow(X,Ak*(Ak >0)) )
 	# print MprojReaction
-	return MprojReaction.tolist() + [0.]*Ak.shape[0]
+	return [0.]*Ak.shape[0] + MprojReaction.tolist() 
 
 def KLDiv(Y,X):
 	return np.sum(X*np.log(X/Y))
 # Give Model Here
 A = [[2,1,0],[0,1,2]]
 O = [[0,2,3],[1,1,1]]
-u = [1,1]
+u = [1.25,1]
 X_init = [0.5,0.25,0.25]
 param_init = [1,1]
 # A = [[3,1,0,2],[0,2,3,1]]
@@ -91,7 +91,7 @@ print "Kernel Basis of A:"
 print Ak
 
 
-t = np.linspace(0, 200, ts)
+t = np.linspace(0, 100, ts)
 Y = arraypow(theta,A)
 Y = Y/np.sum(Y)
 print "Starting point on toric ray:"
@@ -99,19 +99,23 @@ print Y
 print "Starting point on affine space:"
 print X
 y0 = np.concatenate((Y,X))
+eps = 10**-15
 while(True):
 	sol = odeint(EProj, y0, t, args=(Ok,))
 	y = sol[-1,:]
-	if (y == y0).all():
+	# if (y == y0).all():
+	if KLDiv(y,y0)<eps:
 		break
-	print "After EProjection:"
-	print y,y0
+	# print "After EProjection:"
+	# print y,y0
 	y0 = y	
 	sol = odeint(MProj, y0, t,args = (Ak,))
-	y = sol[-1,:]		
-	print "After MProjection:"
-	print y,y0
-	if (y == y0).all():
+	y = np.concatenate((sol[-1,A.shape[1]:],y0[O.shape[1]:]))
+
+	# print "After MProjection:"
+	# print y,y0
+	# if (y == y0).all():
+	if KLDiv(y,y0)<eps:
 		break
 	y0 = y
 
@@ -125,3 +129,8 @@ print Y,X
 # Calculating KL - Divergence
 print "KL Divergence:"
 print KLDiv(Y,X)
+
+print (Y[1]**2)/(Y[0]*Y[2])
+print (X[1]**2)/(X[0]*X[2])
+print O.dot(X)
+print O.dot(Y)
