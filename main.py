@@ -19,9 +19,9 @@ def ode(y,t,A,Ok):
 
 # Give Model Here
 A = [[2,1,0],[0,1,2]]
-O = [[0,1,3],[1,1,1]]
+O = [[1,0,10],[1,1,1]]
 u = [1,1]
-X_init = [0.5,0.25,0.25]
+X_init = [0.55,0.15,0.3]
 param_init = [1,1]
 # A = [[3,1,0,2],[0,2,3,1]]
 # O = [[1,1,0,0],[1,1,1,1]]
@@ -32,7 +32,7 @@ param_init = [1,1]
 # X_init = [1/.6,1/.6,1/.6,1/.6,1/.12,1/.12,1/.12,1/.12]
 # param_init = [1.,1.,1.,1/.2,1/.2,1.]
 # Number of timesteps
-ts = 50000
+ts = 1000000
 
 A = np.array(A)
 O = np.array(O)
@@ -91,7 +91,7 @@ print theta, X
 print "u (equals OX_init):"
 print O.dot(X)
 
-t = np.linspace(0, 2000, ts)
+t = np.linspace(0, 100000, ts)
 y0 = np.concatenate((theta,X))
 sol = odeint(ode, y0, t, args=(A,Ok))
 # Final theta and X
@@ -101,7 +101,7 @@ X = sol[-1,A.shape[0]:]
 print "Final Theta and  X:"
 print theta,X
 
-print "MLD:"
+print "Y (MLD):"
 Y = arraypow(theta,A)
 print Y
 # Print the rates to check
@@ -113,7 +113,7 @@ print np.sum(X*np.log(X/Y))
 print "OX (should be equal to u):"
 print O.dot(X)
 
-print "OY, Y is MLD"
+print "OY, where Y is MLD"
 print O.dot(Y)
 
 print "X^Ak"
