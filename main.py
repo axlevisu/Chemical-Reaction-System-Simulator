@@ -19,10 +19,10 @@ def ode(y,t,A,Ok):
 
 # Give Model Here
 A = [[2,1,0],[0,1,2]]
-O = [[1,0,10],[1,1,1]]
+O = [[0,1,3],[1,1,1]]
 u = [1,1]
-X_init = [0.55,0.15,0.3]
-param_init = [1,1]
+X_init = [0.6,0.1,0.3]
+param_init = [0.5,0.2]
 # A = [[3,1,0,2],[0,2,3,1]]
 # O = [[1,1,0,0],[1,1,1,1]]
 # X_init = [0.3,0.2,0.1,0.4]
@@ -65,8 +65,6 @@ else:
 	theta = 1.0*param_init
 
 if X_init is None:
-	# This code is incomplete
-	# TODO: Add code here for an appropiate kernel element, use sympy for null space
 	B = np.linalg.pinv(O)
 	X =  B.dot(u) # TODO: Add a vector from the nullspace and make sure X is positive
 else:
