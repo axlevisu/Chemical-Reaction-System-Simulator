@@ -32,8 +32,8 @@ param_init = [1.,1.]
 # param_init = [1.,1.,1.,1/.2,1/.2,1.]
 
 # Number of timesteps
-ts = 1000000
-t = 100000
+ts = 1000
+t = 10
 
 A = np.array(A)
 O = np.array(O)
@@ -106,7 +106,7 @@ reactions = np.array(reactions)
 rates = np.array(rates)
 system = MassActionSystem(reactions,rates)
 system.set_concentrations(Y_init)
-output = system.run()
+output = system.run(t=t,ts=ts)
 Y = system.current_concentrations()
 
 theta = Y[:St]
@@ -128,7 +128,7 @@ print O.dot(X)
 print "Final X^Ak:"
 print arraypow(X,Ak.T)
 
-print "Final Oxtheta^A or OxMLD"
+print "Final Oxtheta^A or OxMLD, is it ",u,"?"
 print O.dot(MLD) 
 
 print "Final dy/dt:"
@@ -136,3 +136,11 @@ print system.dydt()
 
 print "Final Lyapunov"
 print Lyapunov(X,MLD)
+
+t = np.linspace(0, t, ts)
+lyapunov = [Lyapunov(arraypow(y[:St],A),y[St:]) for y in output]
+plt.plot(t, lyapunov, label="Lyapunov Function")
+plt.legend(loc='best')
+plt.xlabel('t')
+plt.grid()
+plt.show()
