@@ -34,7 +34,7 @@ class MassActionSystem(object):
 
 	def set_concentrations(self,concentrations):
 		concentrations = 1.0*np.array(concentrations)
-		if concentrations.shape[0] == self.reactions.shape[1]:
+		if concentrations.shape[0] == self.reactions.shape[2]:
 			self.concentrations = concentrations
 		else:
 			print "Wrong Initialization: Shapes of concentrations and reactions dont match ", concentrations.shape[0], "!=", self.reactions.shape[1]
