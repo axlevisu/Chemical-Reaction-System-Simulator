@@ -3,7 +3,7 @@ import numpy as np
 from sympy import *
 import matplotlib.pyplot as plt
 from fractions import Fraction
-
+from ReactionSystem.ReactionSystem import *
 def Lyapunov(X,Y):
 	return np.sum(Y - X + (X*np.log(X/Y)))
 
@@ -116,6 +116,4 @@ for i in xrange(Ok.shape[0]):
 
 reactions = np.array(reactions)
 rates = np.array(rates)
-print reactions
-print rates
-print Y_init
+system = 

@@ -1,4 +1,4 @@
-# ReactionSystem.py
+# MassActionSystem.py
 import numpy as np
 from scipy.integrate import odeint
 
@@ -18,10 +18,10 @@ def odes(y,t,R,k):
 	return dydt 
 
 
-class ReactionSystem(object):
-	"""docstring for ReactionSystem"""
+class MassActionSystem(object):
+	"""docstring for MassActionSystem"""
 	def __init__(self, reactions, rates):
-		# super(ReactionSystem, self).__init__()
+		# super(MassActionSystem, self).__init__()
 		"""Each reaction in reactions is 
 		a pair of complex (l,r) in l --> r"""
 		reactions = np.array(reactions)
@@ -68,7 +68,7 @@ class ReactionSystem(object):
 def main():
 	reactions = [[[1,0],[0,1]], [[0,1],[1,0]]]
 	rates = [1,1]
-	system = ReactionSystem(reactions,rates)
+	system = MassActionSystem(reactions,rates)
 	system.set_concentrations([2.,4.])
 	system.run()
 	print system.current_concentrations()
