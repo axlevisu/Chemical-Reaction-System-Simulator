@@ -86,9 +86,7 @@ for i in xrange(A.shape[1]):
 	column = A.T[i].tolist()
 	complexl = column + [0]*Sx
 	complexr = [0]*S
-	reactions.append([complexl,complexr])
-	complexr =complexr[:]
-	complexl =complexl[:]
+	reactions.append([complexl[:],complexr[:]])
 	complexr[i+St] =1
 	complexl[i+St] =1
 	reactions.append([complexr,complexl])
@@ -102,16 +100,6 @@ for i in xrange(Ok.shape[0]):
 	p = (kernel*(kernel>0)).tolist()                #Positive complex
 	n = (-kernel*(kernel<0)).tolist()				#Negative complex
 	reactions = reactions + [ [f + p,f + n],[b + n,b + p]]
-	# complexl, complexr = np.zeros(S, dtype =np.int8),np.zeros(S, dtype =np.int8)
-	# complexl[St:] =  Ok*(Ok>0) 
-	# complexr[St:] = -Ok*(Ok<0)
-	# complexl[:St] = -catalysis*(catalysis <0)
-	# complexr[:St] = -catalysis*(catalysis <0)
-	# reaction =[complexl[:],complexr[:]]
-	# reactions.append(reaction) 	
-	# complexl[:St] = catalysis*(catalysis >0)
-	# complexr[:St] = catalysis*(catalysis >0)
-	# reactions.append([complexr,complexl])
 	rates = rates +[1.,1.]
 
 reactions = np.array(reactions)
