@@ -7,14 +7,14 @@ def arraypow(x,A):
 	return np.prod(x**(A.T),axis=-1)
 
 def odes(y,t,R,k):
+	#TODO: Convert the whole thing a single expression (Don't be lazy!)
 	dydt = np.zeros(y.shape[0])
 	for i in xrange(R.shape[0]):
-		l =  (R[i] > 0)*R[i]
-		r = -((R[i] < 0)*R[i])
-		# print l,r
-		dydt += k[i]*(r-l)*arraypow(y,l)
-	
-	# print dydt
+		# l =  (R[i] > 0)*R[i] # Species in the left
+		# r = -((R[i] < 0)*R[i]) # Species in the right
+		l =  R[i][0] # Species in the left
+		r =  R[i][1] # Species in the right
+		dydt += k[i]*(r-l)*arraypow(y,l)	
 	return dydt 
 
 
@@ -22,6 +22,8 @@ class ReactionSystem(object):
 	"""docstring for ReactionSystem"""
 	def __init__(self, reactions, rates):
 		# super(ReactionSystem, self).__init__()
+		"""Each reaction in reactions is 
+		a pair of complex (l,r) in l --> r"""
 		reactions = np.array(reactions)
 		rates = np.array(rates)*1.0
 		self.reactions = reactions
@@ -64,13 +66,13 @@ class ReactionSystem(object):
 
 
 def main():
-	reactions = [[1,-1],[-1,1]]
+	reactions = [[[1,0],[0,1]], [[0,1],[1,0]]]
 	rates = [1,1]
 	system = ReactionSystem(reactions,rates)
-	system.set_concentrations([2,4])
+	system.set_concentrations([2.,4.])
 	system.run()
 	print system.current_concentrations()
-	# print system.dydt()
+	print system.dydt()
 	return
 
 if __name__ == '__main__':
