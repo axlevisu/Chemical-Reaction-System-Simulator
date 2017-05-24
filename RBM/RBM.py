@@ -23,6 +23,10 @@ class RBM:
 						quo = (j-nos_independent_vars) / self.hidden_layer  #independent
 						rem = (j-nos_independent_vars) - (self.hidden_layer*quo) 
 						A[j,i] = int(rbmstate[-(quo+1)])*int(rbmstate[-(self.visible_layer+rem+1)])
+			# Making Column sums equal
+			last_row = (nos_independent_vars+nos_dependent_vars)*np.ones(2**nos_independent_vars,dtype=np.int8)
+			last_row = last_row - np.sum(A,axis=0)
+			A = np.r_[A,[last_row]]
 		return A
 
 
