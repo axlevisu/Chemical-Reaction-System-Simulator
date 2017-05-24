@@ -25,7 +25,7 @@ def arraypow(x,A):
 def partial_gradient(theta,X,A,Ok):
 	Y = arraypow(theta,A)
 	gt = -(A.dot(X - Y))/theta
-	gX = Ok*((np.log(X/Y)).dot(Ok))
+	gX = (Ok.dot(np.log(X/Y))).dot(Ok)
 	return gt,gX
 
 # Give Model Here
@@ -38,7 +38,7 @@ O = np.array(O)
 param_init = np.array(param_init)
 X_init = np.array(X_init)
 u = O.dot(X_init)
-Ok = KerIntBasis(O).T[0] 
+Ok = KerIntBasis(O).T
 Ak = KerIntBasis(A).T
 
 # Normalizing the parameters
@@ -75,12 +75,12 @@ print u
 
 # Gradient descent params
 al= 0.0005
-Niter = 100000
+Niter = 1000000
 lamda =1
 
 for i in xrange(Niter):
 	gt,gX = partial_gradient(theta,X,A,Ok)
 	theta = theta -al*gt
 	X = X-al*gX
-
+print gt,gX
 print theta,X

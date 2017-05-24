@@ -32,8 +32,8 @@ param_init = [1.,1.]
 # param_init = [1.,1.,1.,1/.2,1/.2,1.]
 
 # Number of timesteps
-ts = 1000
-t = 10
+ts = 1000000
+t = 10000
 
 A = np.array(A)
 O = np.array(O)
