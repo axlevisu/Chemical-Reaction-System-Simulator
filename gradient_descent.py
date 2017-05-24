@@ -75,12 +75,45 @@ print u
 
 # Gradient descent params
 al= 0.0005
-Niter = 1000000
+# Niter = 100000
 lamda =1
-
-for i in xrange(Niter):
+eps = 10**(-12)
+print "Learning Rate:",al
+print "Gradient treshold:", eps
+Niter =0
+while(True):
 	gt,gX = partial_gradient(theta,X,A,Ok)
+	if (np.abs(gt)<eps).all() and (np.abs(gX)<eps).all():
+		break
 	theta = theta -al*gt
 	X = X-al*gX
+	Niter +=1
+
 print gt,gX
-print theta,X
+# print theta,X
+print "Number of iteration taken:",Niter
+MLD =arraypow(theta,A)
+
+print "Final Theta and X:"
+print theta, X
+
+print "MLD: theta^A"
+print  MLD
+
+print "Final sum of MLD"
+print np.sum(MLD)
+
+print "Final OX, should be equal to", u
+print O.dot(X)
+
+print "Final X^Ak:"
+print arraypow(X,Ak.T)
+
+print "Final Oxtheta^A or OxMLD, is it ",u,"?"
+print O.dot(MLD) 
+
+print "Final gradients:"
+print gt,gX
+
+print "Final Lyapunov"
+print Lyapunov(X,MLD)
