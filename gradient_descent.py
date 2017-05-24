@@ -4,6 +4,10 @@ import numpy as np
 from sympy import *
 import matplotlib.pyplot as plt
 from fractions import Fraction
+from timeit import default_timer
+
+random_seed =6
+np.random.seed(random_seed)
 
 def Lyapunov(X,Y):
 	return np.sum(Y - X + (X*np.log(X/Y)))
@@ -46,8 +50,8 @@ if param_init is None:
 	theta = 1.0*np.ones(A.shape[0])/A.shape[1]
 else:
 	# NOT NEEDED: Making sure sum of theta^A is 1 initially
-	theta = 1.0*param_init
-
+	# theta = 1.0*param_init
+	theta = np.random.uniform(0.01,1,A.shape[0])
 if X_init is None:
 	B = np.linalg.pinv(O)
 	X =  B.dot(u) # TODO: Add a vector from the nullspace and make sure X is positive
@@ -74,13 +78,14 @@ print "u (equals OX_init):"
 print u
 
 # Gradient descent params
-al= 0.0005
+al= 0.001
 # Niter = 100000
 lamda =1
 eps = 10**(-12)
 print "Learning Rate:",al
 print "Gradient treshold:", eps
 Niter =0
+start = default_timer()
 while(True):
 	gt,gX = partial_gradient(theta,X,A,Ok)
 	if (np.abs(gt)<eps).all() and (np.abs(gX)<eps).all():
@@ -88,8 +93,7 @@ while(True):
 	theta = theta -al*gt
 	X = X-al*gX
 	Niter +=1
-
-print gt,gX
+stop = default_timer()
 # print theta,X
 print "Number of iteration taken:",Niter
 MLD =arraypow(theta,A)
@@ -117,3 +121,5 @@ print gt,gX
 
 print "Final Lyapunov"
 print Lyapunov(X,MLD)
+
+print "Gradient Descent Took:", str(stop-start) +"s"

@@ -54,7 +54,7 @@ class MassActionSystem(object):
 
 	def run(self,t=100000,ts=1000000):
 		"""
-		Run it for time t with ts time steps
+		Run it for time t with ts number of time steps
 		Outputs the concentration profile for the run
 		default values are 100000 and 1000000
 		"""	
@@ -64,6 +64,30 @@ class MassActionSystem(object):
 		self.concentrations = output[-1,:]
 		return output
 
+	def run_till(self,time_step=0.001,eps = 10**-12):
+		"""
+		Runs till the gradients are less than eps
+		returns time taken with array of concentrations
+		default values of time_step and eps are 10**-3 and 10**-12 
+		"""
+		t = 0
+		ts = time_step
+		y = self.concentrations
+		output = [y]
+		while True:
+			gy = odes(y,t,self.reactions,self.rates)
+			if (np.abs(gy) <eps).all():
+				break
+			dy = gy*ts
+			y += dy
+			t+=ts
+			output.append(y)
+
+		output = np.array(output)
+		self.concentrations =y
+		return output,t
+		
+	
 
 def main():
 	reactions = [[[1,0],[0,1]], [[0,1],[1,0]]]

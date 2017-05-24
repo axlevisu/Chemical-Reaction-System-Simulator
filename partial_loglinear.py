@@ -4,6 +4,10 @@ from sympy import *
 import matplotlib.pyplot as plt
 from fractions import Fraction
 from ReactionSystem.MassActionSystem import MassActionSystem, arraypow
+from timeit import default_timer
+
+random_seed =6
+np.random.seed(random_seed)
 
 def Lyapunov(X,Y):
 	return np.sum(Y - X + (X*np.log(X/Y)))
@@ -48,7 +52,8 @@ if param_init is None:
 	theta = 1.0*np.ones(A.shape[0])/A.shape[1]
 else:
 	# NOT NEEDED: Making sure sum of theta^A is 1 initially
-	theta = 1.0*param_init
+	theta = np.random.uniform(0.01,1,A.shape[0])
+	# theta = 1.0*param_init
 
 if X_init is None:
 	B = np.linalg.pinv(O)
@@ -106,9 +111,16 @@ reactions = np.array(reactions)
 rates = np.array(rates)
 system = MassActionSystem(reactions,rates)
 system.set_concentrations(Y_init)
-output = system.run(t=t,ts=ts)
+# output = system.run(t=t,ts=ts)
+time_step =0.001
+eps = 10**-12
+print "Each time step is:",str(time_step)+"s"
+print "Gradient treshold:", eps
+start = default_timer()
+output,t = system.run_till(time_step=time_step,eps=eps)
+stop = default_timer()
 Y = system.current_concentrations()
-
+print "Ran for:", str(t)+"s", "or",t/time_step,"iterations"
 theta = Y[:St]
 X =Y[St:]
 MLD =arraypow(theta,A)
@@ -136,7 +148,7 @@ print system.dydt()
 
 print "Final Lyapunov"
 print Lyapunov(X,MLD)
-
+print "Mass Action Kinetics Took:", str(stop-start) +"s"
 # t = np.linspace(0, t, ts)
 # lyapunov = [Lyapunov(arraypow(y[:St],A),y[St:]) for y in output]
 # plt.plot(t, lyapunov, label="Lyapunov Function")
