@@ -1,9 +1,4 @@
 import numpy as np 
-import numpy as np
-from sympy import *
-import matplotlib.pyplot as plt
-from fractions import Fraction
-from ReactionSystem.MassActionSystem import MassActionSystem, arraypow
 
 #This class just makes/initialises the nodes and the matrix A, O for a boltzmann machine so that we can run it 
 #on our CRN simulator
@@ -17,7 +12,7 @@ class RBM:
 		nos_dependent_vars   = self.visible_layer*self.hidden_layer # = theta_{ij}
 		total_theta = nos_independent_vars + nos_dependent_vars
 		if (self.fully_connected):
-			A = np.zeros((nos_independent_vars+nos_dependent_vars,2**nos_independent_vars))
+			A = np.zeros((nos_independent_vars+nos_dependent_vars,2**nos_independent_vars),dtype=np.int8)
 			for i in range(2**nos_independent_vars):
 				rbmstate = bin(i)[2:]
 				rbmstate = '0'*(nos_independent_vars-len(rbmstate)) + rbmstate  
@@ -31,9 +26,14 @@ class RBM:
 		return A
 
 
-trivial = RBM(3,1)
-A = trivial.create_boltzmann_machine()
-print A
+def main():
+	trivial = RBM(3,1)
+	A = trivial.create_boltzmann_machine()
+	print A
+
+
+if __name__ == '__main__':
+	main()
 
 
 
