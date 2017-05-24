@@ -18,7 +18,15 @@ def KerIntBasis(B):
 	Bk = np.array(Bk).T #Basis are column elements
 	return Bk
 
-def partial_gradient()
+def arraypow(x,A):
+	#Computes(\ theta^A)
+	return np.prod(x**(A.T),axis=-1)
+
+def partial_gradient(theta,X,A,Ok):
+	Y = arraypow(theta,A)
+	gt = -(A.dot(X - Y))/theta
+	gX = Ok*((np.log(X/Y)).dot(Ok))
+	return gt,gX
 
 # Give Model Here
 A = [[2,1,0],[0,1,2]]
@@ -30,8 +38,8 @@ O = np.array(O)
 param_init = np.array(param_init)
 X_init = np.array(X_init)
 u = O.dot(X_init)
-Ok = KerIntBasis(O) 
-Ak = KerIntBasis(A)
+Ok = KerIntBasis(O).T[0] 
+Ak = KerIntBasis(A).T
 
 # Normalizing the parameters
 if param_init is None:
@@ -66,4 +74,13 @@ print "u (equals OX_init):"
 print u
 
 # Gradient descent params
-al= 0.001
+al= 0.0005
+Niter = 100000
+lamda =1
+
+for i in xrange(Niter):
+	gt,gX = partial_gradient(theta,X,A,Ok)
+	theta = theta -al*gt
+	X = X-al*gX
+
+print theta,X

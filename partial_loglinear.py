@@ -137,10 +137,10 @@ print system.dydt()
 print "Final Lyapunov"
 print Lyapunov(X,MLD)
 
-t = np.linspace(0, t, ts)
-lyapunov = [Lyapunov(arraypow(y[:St],A),y[St:]) for y in output]
-plt.plot(t, lyapunov, label="Lyapunov Function")
-plt.legend(loc='best')
-plt.xlabel('t')
-plt.grid()
-plt.show()
+# t = np.linspace(0, t, ts)
+# lyapunov = [Lyapunov(arraypow(y[:St],A),y[St:]) for y in output]
+# plt.plot(t, lyapunov, label="Lyapunov Function")
+# plt.legend(loc='best')
+# plt.xlabel('t')
+# plt.grid()
+# plt.show()
