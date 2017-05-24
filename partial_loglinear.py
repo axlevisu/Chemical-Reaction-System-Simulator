@@ -32,18 +32,17 @@ param_init = [1.,1.]
 # X_init = [0.3,0.2,0.1,0.4]
 # A = [[0,0,0,0,1,1,1,1],[0,0,1,1,0,0,1,1],[0,1,0,1,0,1,0,1],[0,0,0,0,0,0,1,1],[0,0,0,1,0,0,0,1],[5,4,4,2,4,3,2,0]]
 # O = [[1,0,1,0,0,0,0,0],[0,1,0,1,0,0,0,0],[0,0,0,0,1,0,1,0],[0,0,0,0,0,1,0,1]]
-# X_init = [1/.6,1/.6,1/.6,1/.6,1/.12,1/.12,1/.12,1/.12]
+# X_init = [1/6.,1/6.,1/6.,1/6.,1/12.,1/12.,1/12.,1/12.]
 # param_init = [1.,1.,1.,1/.2,1/.2,1.]
 
 # Number of timesteps
 ts = 1000000
-t = 10000
+t = 100000
 
 A = np.array(A)
 O = np.array(O)
 param_init = np.array(param_init)
 X_init = np.array(X_init)
-u = O.dot(X_init)
 Ok = KerIntBasis(O).T 
 Ak = KerIntBasis(A).T
 
@@ -62,6 +61,7 @@ else:
 	# Makes sure sum of X is 1
 	X = 1.0*X_init/sum(X_init)
 
+u = O.dot(X)
 print "Design Matrix:"
 print A
 
@@ -118,6 +118,7 @@ print "Each time step is:",str(time_step)+"s"
 print "Gradient treshold:", eps
 start = default_timer()
 output,t = system.run_till(time_step=time_step,eps=eps)
+# output = system.run(t=t,ts=ts)
 stop = default_timer()
 Y = system.current_concentrations()
 print "Ran for:", str(t)+"s", "or",t/time_step,"iterations"

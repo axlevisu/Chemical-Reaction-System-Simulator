@@ -7,15 +7,9 @@ def arraypow(x,A):
 	return np.prod(x**(A.T),axis=-1)
 
 def odes(y,t,R,k):
-	#TODO: Convert the whole thing a single expression (Don't be lazy!)
-	dydt = np.zeros(y.shape[0])
-	for i in xrange(R.shape[0]):
-		# l =  (R[i] > 0)*R[i] # Species in the left
-		# r = -((R[i] < 0)*R[i]) # Species in the right
-		l =  R[i][0] # Species in the left
-		r =  R[i][1] # Species in the right
-		dydt += k[i]*(r-l)*arraypow(y,l)	
-	return dydt 
+	l = R[:,0]
+	r = R[:,1]
+	return ((r-l).T).dot(arraypow(y,l.T)*k) 
 
 
 class MassActionSystem(object):
