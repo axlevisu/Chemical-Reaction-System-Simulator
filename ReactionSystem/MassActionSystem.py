@@ -14,7 +14,7 @@ def odes(y,t,R,k):
 
 class MassActionSystem(object):
 	"""docstring for MassActionSystem"""
-	def __init__(self, reactions, rates):
+	def __init__(self, reactions, rates, species =None):
 		# super(MassActionSystem, self).__init__()
 		"""Each reaction in reactions is 
 		a pair of complex (l,r) in l --> r"""
@@ -22,9 +22,25 @@ class MassActionSystem(object):
 		rates = np.array(rates)*1.0
 		self.reactions = reactions
 		self.rates = rates
-
+		if species is None:
+			species =['S_'+str(i+1) for i in xrange(reactions.shape[2])]
+		self.species = species
 #### TODO: Add a method to add more reactions
-#### TODO: Add a method to visualize
+
+	def display_reactions(self):
+		reaction_set =""
+		for i in xrange(self.reactions.shape[0]):
+			l = self.reactions[i][0]
+			r = self.reactions[i][0]
+			S = self.species
+			left_complex =""
+			right_complex=""
+			for j in xrange(len(S)):
+				left_complex+= " " + str(l[j]) +S[j] + " +"
+				right_complex+=" " + str(r[j]) +S[j] + " +"
+			reaction = left_complex[:-1] + " ------> " + right_complex[:-1] + "rate: "+ str(self.rates[i]) + "\n\n"
+			reaction_set +=reaction 
+		return reaction_set[:-1]
 
 	def set_concentrations(self,concentrations):
 		concentrations = 1.0*np.array(concentrations)

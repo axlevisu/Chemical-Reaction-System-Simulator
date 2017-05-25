@@ -87,6 +87,7 @@ S = Y_init.shape[0] # Number of species
 St = theta.shape[0] # Number of theta species
 Sx = X.shape[0] # Number of X species
 # 2 for every column
+species =[]
 for i in xrange(A.shape[1]):
 	column = A.T[i].tolist()
 	complexl = column + [0]*Sx
@@ -107,9 +108,17 @@ for i in xrange(Ok.shape[0]):
 	reactions = reactions + [ [f + p,f + n],[b + n,b + p]]
 	rates = rates +[1.,1.]
 
+for i in xrange(A.shape[0]):
+	species.append("t_"+str(i+1))
+
+for i in xrange(O.shape[1]):
+	species.append("X_"+str(i+1))
+
 reactions = np.array(reactions)
 rates = np.array(rates)
-system = MassActionSystem(reactions,rates)
+system = MassActionSystem(reactions,rates,species)
+print "The Reactions are:"
+print system.display_reactions()
 system.set_concentrations(Y_init)
 # output = system.run(t=t,ts=ts)
 time_step =0.001
