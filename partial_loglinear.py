@@ -26,14 +26,12 @@ def KerIntBasis(B):
 A = [[2,1,0],[0,1,2]]
 O = [[0,1,3],[1,1,1]]
 X_init = [0.5,0.25,0.25]
-param_init = [1.,1.]
 # A = [[3,1,0,2],[0,2,3,1]]
 # O = [[1,1,0,0],[1,1,1,1]]
 # X_init = [0.3,0.2,0.1,0.4]
 # A = [[0,0,0,0,1,1,1,1],[0,0,1,1,0,0,1,1],[0,1,0,1,0,1,0,1],[0,0,0,0,0,0,1,1],[0,0,0,1,0,0,0,1],[5,4,4,2,4,3,2,0]]
 # O = [[1,0,1,0,0,0,0,0],[0,1,0,1,0,0,0,0],[0,0,0,0,1,0,1,0],[0,0,0,0,0,1,0,1]]
 # X_init = [1/6.,1/6.,1/6.,1/6.,1/12.,1/12.,1/12.,1/12.]
-# param_init = [1.,1.,1.,1/.2,1/.2,1.]
 
 # Number of timesteps
 ts = 1000000
@@ -41,18 +39,13 @@ t = 100000
 
 A = np.array(A)
 O = np.array(O)
-param_init = np.array(param_init)
 X_init = np.array(X_init)
 Ok = KerIntBasis(O).T 
 Ak = KerIntBasis(A).T
 
-# Normalizing the parameters
-if param_init is None:
-	theta = 1.0*np.ones(A.shape[0])/A.shape[1]
-else:
-	# NOT NEEDED: Making sure sum of theta^A is 1 initially
-	theta = np.random.uniform(0.01,1,A.shape[0])
-	# theta = 1.0*param_init
+# Randomly initialize parameters
+theta = np.random.uniform(0.01,1,A.shape[0])
+# theta = 1.0*np.ones(A.shape[0])
 
 if X_init is None:
 	B = np.linalg.pinv(O)
