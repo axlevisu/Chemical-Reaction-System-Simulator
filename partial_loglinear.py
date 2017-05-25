@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from fractions import Fraction
 from ReactionSystem.MassActionSystem import MassActionSystem, arraypow
 from timeit import default_timer
-
+from RBM.RBM import RBM
 random_seed =6
 np.random.seed(random_seed)
 
@@ -157,3 +157,8 @@ print "Mass Action Kinetics Took:", str(stop-start) +"s"
 # plt.xlabel('t')
 # plt.grid()
 # plt.show()
+trivial = RBM()
+A = trivial.create_boltzmann_machineA()
+O = trivial.create_boltzmann_machineO()
+print A 
+print O
