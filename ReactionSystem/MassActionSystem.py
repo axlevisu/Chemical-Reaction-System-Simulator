@@ -7,8 +7,8 @@ def arraypow(x,A):
 	return np.prod(x**(A.T),axis=-1)
 
 def odes(y,t,R,k):
-	l = R[:,0]
-	r = R[:,1]
+	l = R[:,0] # l, left complex
+	r = R[:,1] # r, right complex
 	return ((r-l).T).dot(arraypow(y,l.T)*k) 
 
 
@@ -28,6 +28,9 @@ class MassActionSystem(object):
 #### TODO: Add a method to add more reactions
 
 	def display_reactions(self):
+		"""
+		Puts together the set of reations in a string and returns it
+		"""
 		reaction_set =""
 		for i in xrange(self.reactions.shape[0]):
 			l = self.reactions[i][0]
@@ -43,6 +46,9 @@ class MassActionSystem(object):
 		return reaction_set[:-1]
 
 	def set_concentrations(self,concentrations):
+		"""
+		Sets the concentration of the species
+		"""
 		concentrations = 1.0*np.array(concentrations)
 		if concentrations.shape[0] == self.reactions.shape[2]:
 			self.concentrations = concentrations
