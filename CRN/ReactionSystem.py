@@ -80,7 +80,7 @@ class MassActionSystem(object):
 		self.concentrations = output[-1,:]
 		return output
 
-	def run_till(self,delta_time=0.001,eps = 10**-12,every=10):
+	def run_till(self,delta_time=0.001,eps = 10**-12,every=10, stop=1000000):
 		"""
 		Runs till the gradients are less than eps
 		returns time taken with array of concentrations
@@ -98,7 +98,9 @@ class MassActionSystem(object):
 			 	o = odeint(odes, y, t_index, args= (self.reactions,self.rates))
 			 	y = o[-1,:]
 			 	t+=every
-			 	output = output + o[1:] 
+			 	output = output + o[1:]
+			 	if t>stop:
+			 		break 
 		else:
 			while True:
 				gy = odes(y,t,self.reactions,self.rates)
@@ -107,6 +109,8 @@ class MassActionSystem(object):
 				y+= gy*delta_time
 				t+=delta_time
 				output.append(y)
+				if t>stop:
+					break
 
 		output = np.array(output)
 		self.concentrations =y
