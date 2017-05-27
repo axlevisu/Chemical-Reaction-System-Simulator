@@ -114,16 +114,16 @@ print "The Reactions are:"
 print system.display_reactions()
 system.set_concentrations(Y_init)
 # output = system.run(t=t,ts=ts)
-time_step =0.001
+delta_time =0.001
 eps = 10**-12
-print "Each time step is:",str(time_step)+"s"
+print "Each time step is:",str(delta_time)+"s"
 print "Gradient treshold:", eps
 start = default_timer()
-output,t = system.run_till(time_step=time_step,eps=eps)
+output,t = system.run_till(delta_time=delta_time,eps=eps,every=100)
 # output = system.run(t=t,ts=ts)
 stop = default_timer()
 Y = system.current_concentrations()
-print "Ran for:", str(t)+"s", "or",t/time_step,"iterations"
+print "Ran for:", str(t)+"s", "or",t/delta_time,"iterations"
 theta = Y[:St]
 X =Y[St:]
 MLD =arraypow(theta,A)

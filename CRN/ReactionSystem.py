@@ -74,30 +74,39 @@ class MassActionSystem(object):
 		Outputs the concentration profile for the run
 		default values are 100000 and 1000000
 		"""	
-		t = np.linspace(0, t, ts)
+		t_index = np.linspace(0, t, ts)
 		y = self.concentrations
-		output = odeint(odes, y, t, args= (self.reactions,self.rates))
+		output = odeint(odes, y, t_index, args= (self.reactions,self.rates))
 		self.concentrations = output[-1,:]
 		return output
 
-	def run_till(self,time_step=0.001,eps = 10**-12):
+	def run_till(self,delta_time=0.001,eps = 10**-12,every=10):
 		"""
 		Runs till the gradients are less than eps
 		returns time taken with array of concentrations
 		default values of time_step and eps are 10**-3 and 10**-12 
 		"""
-		t = 0
-		ts = time_step
 		y = self.concentrations
 		output = [y]
-		while True:
-			gy = odes(y,t,self.reactions,self.rates)
-			if (np.abs(gy) <eps).all():
-				break
-			dy = gy*ts
-			y += dy
-			t+=ts
-			output.append(y)
+		t=0
+	 	t_index = np.linspace(0,every,int(every/(delta_time)))
+		if every>10*delta_time:
+			 while True:
+			 	gy = odes(y,t,self.reactions,self.rates)
+				if (np.abs(gy) <eps).all():
+					break
+			 	o = odeint(odes, y, t_index, args= (self.reactions,self.rates))
+			 	y = o[-1,:]
+			 	t+=every
+			 	output = output + o[1:] 
+		else:
+			while True:
+				gy = odes(y,t,self.reactions,self.rates)
+				if (np.abs(gy) <eps).all():
+					break
+				y+= gy*delta_time
+				t+=delta_time
+				output.append(y)
 
 		output = np.array(output)
 		self.concentrations =y
