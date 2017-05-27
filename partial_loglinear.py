@@ -3,7 +3,7 @@ import numpy as np
 from sympy import *
 import matplotlib.pyplot as plt
 from fractions import Fraction
-from ReactionSystem.MassActionSystem import MassActionSystem, arraypow
+from CRN.ReactionSystem import MassActionSystem, arraypow
 from timeit import default_timer
 from RBM.RBM import RBM
 random_seed =6
