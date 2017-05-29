@@ -1,6 +1,7 @@
 # MassActionSystem.py
 import numpy as np
 from scipy.integrate import odeint
+import matplotlib.pyplot as plt
 
 def arraypow(x,A):
 	#Computes(\ theta^A)
@@ -68,7 +69,7 @@ class MassActionSystem(object):
 		"""
 		return self.concentrations
 
-	def run(self,t=100000,ts=1000000):
+	def run(self,t=10000000,ts=100000000,plot=False):
 		"""
 		Run it for time t with ts number of time steps
 		Outputs the concentration profile for the run
@@ -78,9 +79,17 @@ class MassActionSystem(object):
 		y = self.concentrations
 		output = odeint(odes, y, t_index, args= (self.reactions,self.rates))
 		self.concentrations = output[-1,:]
+		if plot:
+			for i in xrange(output.shape[1]):
+				label = self.species[i]
+				plt.plot(t_index, output[:, i], label=label)
+			plt.legend(loc='best')
+			plt.xlabel('t')
+			plt.grid()
+			plt.show()
 		return output
 
-	def run_till(self,delta_time=0.001,eps = 10**-12,every=10, stop=1000000):
+	def run_till(self,delta_time=0.001,eps = 10**-12,every=10, stop=100000):
 		"""
 		Runs till the gradients are less than eps
 		returns time taken with array of concentrations
