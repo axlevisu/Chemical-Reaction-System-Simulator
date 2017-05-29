@@ -1,6 +1,6 @@
 # partial_loglinear.py
 import numpy as np
-from sympy import *
+from sympy import Matrix,lcm
 import matplotlib.pyplot as plt
 from fractions import Fraction
 from CRN.ReactionSystem import MassActionSystem, arraypow
@@ -16,7 +16,7 @@ def KerIntBasis(B):
 	BKer = 1.0*np.array(Matrix(B).nullspace())
 	Bk =[]
 	for basis in BKer: 
-		l = lcm(map(lambda x: Fraction(x).denominator,map(str,basis)))
+		l = lcm(map(lambda x: Fraction(x).limit_denominator().denominator,map(str,basis)))
 		basis = map(int,l*basis)
 		Bk.append(basis)	
 	Bk = np.array(Bk).T #Basis are column elements
@@ -24,8 +24,8 @@ def KerIntBasis(B):
 
 # Give Model Here
 A = [[2,1,0],[0,1,2]]
-O = [[0,1,10],[1,1,1]]
-X_init = [0.,0.21,0.79]
+O = [[7,10,2],[1,1,1]]
+X_init = [0.1,0.7,0.2]
 # A = [[3,1,0,2],[0,2,3,1]]
 # O = [[1,1,0,0],[1,1,1,1]]
 # X_init = [0.3,0.2,0.1,0.4]
@@ -40,7 +40,8 @@ t = 100000
 A = np.array(A)
 O = np.array(O)
 X_init = np.array(X_init)
-Ok = KerIntBasis(O).T 
+Ok = KerIntBasis(O).T
+Ok = Ok*2.0/np.max(np.abs(Ok)) 
 Ak = KerIntBasis(A).T
 
 # Randomly initialize parameters
@@ -119,11 +120,12 @@ eps = 10**-12
 print "Each time step is:",str(delta_time)+"s"
 print "Gradient treshold:", eps
 start = default_timer()
-output,t = system.run_till(delta_time=delta_time,eps=eps,every=100)
-# output = system.run(t=t,ts=ts)
+# output,t = system.run_till(delta_time=delta_time,eps=eps,every=100)
+output = system.run(t=1000,ts=100000)
+# output = system.run()
 stop = default_timer()
 Y = system.current_concentrations()
-print "Ran for:", str(t)+"s", "or",t/delta_time,"iterations"
+# print "Ran for:", str(t)+"s", "or",t/delta_time,"iterations"
 theta = Y[:St]
 X =Y[St:]
 MLD =arraypow(theta,A)

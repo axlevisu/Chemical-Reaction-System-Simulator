@@ -1,7 +1,7 @@
 # gradient_descent.py
 # partial_loglinear.py
 import numpy as np
-from sympy import *
+from sympy import Matrix,lcm
 import matplotlib.pyplot as plt
 from fractions import Fraction
 from timeit import default_timer
@@ -16,7 +16,7 @@ def KerIntBasis(B):
 	BKer = 1.0*np.array(Matrix(B).nullspace())
 	Bk =[]
 	for basis in BKer: 
-		l = lcm(map(lambda x: Fraction(x).denominator,map(str,basis)))
+		l = lcm(map(lambda x: Fraction(x).limit_denominator().denominator,map(str,basis)))
 		basis = map(int,l*basis)
 		Bk.append(basis)	
 	Bk = np.array(Bk).T #Basis are column elements
@@ -34,34 +34,22 @@ def partial_gradient(theta,X,A,Ok):
 
 # Give Model Here
 A = [[2,1,0],[0,1,2]]
-O = [[0,1,3],[1,1,1]]
-X_init = [0.5,0.25,0.25]
-param_init = [1.,1.]
+O = [[7,10,2],[1,1,1]]
+X_init = [0.1,0.7,0.2]
 # A = [[0,0,0,0,1,1,1,1],[0,0,1,1,0,0,1,1],[0,1,0,1,0,1,0,1],[0,0,0,0,0,0,1,1],[0,0,0,1,0,0,0,1],[5,4,4,2,4,3,2,0]]
 # O = [[1,0,1,0,0,0,0,0],[0,1,0,1,0,0,0,0],[0,0,0,0,1,0,1,0],[0,0,0,0,0,1,0,1]]
 # X_init = [1/6.,1/6.,1/6.,1/6.,1/12.,1/12.,1/12.,1/12.]
 # param_init = [1.,1.,1.,1/.2,1/.2,1.]
 A = np.array(A)
 O = np.array(O)
-param_init = np.array(param_init)
-X_init = np.array(X_init)
-u = O.dot(X_init)
+# Randomly initialize parameters
+theta = np.random.uniform(0.01,1,A.shape[0])
+X = np.array(X_init)/np.sum(X_init)
+u = O.dot(X)
 Ok = KerIntBasis(O).T
+Ok = Ok*2.0/np.max(np.abs(Ok)) 
 Ak = KerIntBasis(A).T
 
-# Normalizing the parameters
-if param_init is None:
-	theta = 1.0*np.ones(A.shape[0])/A.shape[1]
-else:
-	# NOT NEEDED: Making sure sum of theta^A is 1 initially
-	# theta = 1.0*param_init
-	theta = np.random.uniform(0.01,1,A.shape[0])
-if X_init is None:
-	B = np.linalg.pinv(O)
-	X =  B.dot(u) # TODO: Add a vector from the nullspace and make sure X is positive
-else:
-	# Makes sure sum of X is 1
-	X = 1.0*X_init/sum(X_init)
 
 print "Design Matrix:"
 print A
@@ -82,7 +70,7 @@ print "u (equals OX_init):"
 print u
 
 # Gradient descent params
-al= 0.00001
+al= 0.0001
 # Niter = 100000
 lamda =1
 eps = 10**(-12)
@@ -90,10 +78,12 @@ print "Learning Rate:",al
 print "Gradient treshold:", eps
 Niter =0
 start = default_timer()
-while(True):
+max_iter =100000
+# while(True):
+for i in xrange(max_iter):
 	gt,gX = partial_gradient(theta,X,A,Ok)
-	if (np.abs(gt)<eps).all() and (np.abs(gX)<eps).all():
-		break
+	# if (np.abs(gt)<eps).all() and (np.abs(gX)<eps).all():
+	# 	break
 	theta = theta -al*gt
 	X = X-al*gX
 	Niter +=1
