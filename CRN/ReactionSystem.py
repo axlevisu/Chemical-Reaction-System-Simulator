@@ -151,7 +151,38 @@ class StochasticSystem(ReactionSystem):
 				 population.shape[0], "!=", self.reactions.shape[1]
 			return self.population
 
-		# def run(self, t):
+		def run(self, t,seed=None,plot=False):
+			"""
+			Gillespie Implementation
+			"""
+			l = self.reactions[:,0]
+			r = self.reactions[:,1]
+			change=r-l
+			time =0
+			times =[]
+			output =[]
+			times.append(time)
+			output.append(self.population)
+			while time<t:			
+				lam = np.prod(comb(self.population,l)*factorial(l),axis=-1)*self.rates
+				lam_sum = np.sum(lam)
+				dt = np.log(1.0/np.random.uniform(0,1))*(1.0/(lam_sum))
+				react = np.where(np.random.multinomial(1,lam/lam_sum)==1)[0][0]
+				self.population = self.population + change[react]
+				time += dt
+				output.append(self.population)
+				times.append(time)
+			output = np.array(output)
+			times = np.array(times)
+			if plot:
+				for i in xrange(output.shape[1]):
+					label = self.species[i]
+					plt.plot(times, output[:, i], label=label)
+				plt.legend(loc='best')
+				plt.xlabel('t')
+				plt.grid()
+				plt.show()
+			return times,output
 
 
 def main():
@@ -163,6 +194,9 @@ def main():
 	print system.current_concentrations()
 	print system.dydt()
 	system = StochasticSystem(reactions,rates)
+	population = [10,10]
+	system.set_population(population)
+	t,o = system.run(10,plot=True)
 	return
 
 if __name__ == '__main__':
