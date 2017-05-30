@@ -1,6 +1,7 @@
 # MassActionSystem.py
 import numpy as np
 from scipy.integrate import odeint
+from scipy.special import comb,factorial
 import matplotlib.pyplot as plt
 
 def arraypow(x,A):
@@ -151,7 +152,7 @@ class StochasticSystem(ReactionSystem):
 			return self.population
 
 		# def run(self, t):
-			
+
 
 def main():
 	reactions = [[[1,0],[0,1]], [[0,1],[1,0]]]
