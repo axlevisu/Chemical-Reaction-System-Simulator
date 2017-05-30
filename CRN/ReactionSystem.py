@@ -13,10 +13,9 @@ def odes(y,t,R,k):
 	return ((r-l).T).dot(arraypow(y,l.T)*k) 
 
 
-class MassActionSystem(object):
-	"""docstring for MassActionSystem"""
+class ReactionSystem(object):
+	"""docstring for ReactionSystem"""
 	def __init__(self, reactions, rates, species =None):
-		# super(MassActionSystem, self).__init__()
 		"""Each reaction in reactions is 
 		a pair of complex (l,r) in l --> r"""
 		reactions = np.array(reactions)
@@ -26,7 +25,7 @@ class MassActionSystem(object):
 		if species is None:
 			species =['S_'+str(i+1) for i in xrange(reactions.shape[2])]
 		self.species = species
-#### TODO: Add a method to add more reactions
+		
 
 	def display_reactions(self):
 		"""
@@ -45,6 +44,13 @@ class MassActionSystem(object):
 			reaction = left_complex[:-1] + " ------> " + right_complex[:-1] + "rate: "+ str(self.rates[i]) + "\n\n"
 			reaction_set +=reaction 
 		return reaction_set[:-1]
+
+
+class MassActionSystem(ReactionSystem):
+	"""docstring for MassActionSystem"""
+	def __init__(self, reactions, rates, species =None):
+		# super(MassActionSystem, self).__init__()
+		super(MassActionSystem,self).__init__(reactions, rates, species)
 
 	def set_concentrations(self,concentrations):
 		"""
