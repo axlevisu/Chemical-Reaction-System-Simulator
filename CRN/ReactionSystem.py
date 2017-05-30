@@ -60,7 +60,8 @@ class MassActionSystem(ReactionSystem):
 		if concentrations.shape[0] == self.reactions.shape[2]:
 			self.concentrations = concentrations
 		else:
-			print "Wrong Initialization: Shapes of concentrations and reactions dont match ", concentrations.shape[0], "!=", self.reactions.shape[1]
+			print "Wrong Initialization: Shapes of concentrations and reactions dont match ",\
+			concentrations.shape[0], "!=", self.reactions.shape[1]
 		return self.concentrations
 
 	def dydt(self):
@@ -75,7 +76,7 @@ class MassActionSystem(ReactionSystem):
 		"""
 		return self.concentrations
 
-	def run(self,t=10000000,ts=100000000,plot=False):
+	def run(self,t=1000,ts=100000,plot=False):
 		"""
 		Run it for time t with ts number of time steps
 		Outputs the concentration profile for the run
@@ -131,7 +132,26 @@ class MassActionSystem(ReactionSystem):
 		self.concentrations =y
 		return output,t
 		
-	
+class StochasticSystem(ReactionSystem):
+		"""docstring for StochasticSystem
+			Gillespie Algorithm implementation
+		"""
+		def __init__(self, reactions, rates, species =None):
+			"""TODO: Maybe add a method to make sure reaction
+			coefficients are integers"""
+			super(StochasticSystem, self).__init__(reactions, rates, species)
+				
+		def set_population(self,population):
+			population = 1.0*np.array(population)
+			if population.shape[0] == self.reactions.shape[2]:
+				self.population = population
+			else:
+				print "Wrong Initialization: Shapes of population and reactions dont match ",\
+				 population.shape[0], "!=", self.reactions.shape[1]
+			return self.population
+
+		# def run(self, t):
+			
 
 def main():
 	reactions = [[[1,0],[0,1]], [[0,1],[1,0]]]
@@ -141,6 +161,7 @@ def main():
 	system.run()
 	print system.current_concentrations()
 	print system.dydt()
+	system = StochasticSystem(reactions,rates)
 	return
 
 if __name__ == '__main__':
