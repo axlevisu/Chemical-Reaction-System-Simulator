@@ -22,40 +22,76 @@ def KerIntBasis(B):
 	Bk = np.array(Bk).T #Basis are column elements
 	return Bk
 
-# Give Model Here
-A = [[2,1,0],[0,1,2]]
-O = [[7,10,2],[1,1,1]]
-X_init = [0.1,0.7,0.2]
-# A = [[3,1,0,2],[0,2,3,1]]
-# O = [[1,1,0,0],[1,1,1,1]]
-# X_init = [0.3,0.2,0.1,0.4]
-# A = [[0,0,0,0,1,1,1,1],[0,0,1,1,0,0,1,1],[0,1,0,1,0,1,0,1],[0,0,0,0,0,0,1,1],[0,0,0,1,0,0,0,1],[5,4,4,2,4,3,2,0]]
-# O = [[1,0,1,0,0,0,0,0],[0,1,0,1,0,0,0,0],[0,0,0,0,1,0,1,0],[0,0,0,0,0,1,0,1]]
-# X_init = [1/6.,1/6.,1/6.,1/6.,1/12.,1/12.,1/12.,1/12.]
+def gram_schmidt(B):
+	oB = [B[0]]
+	for b in B[1:]:
+		x = 0
+		for ob in oB:
+			x += (b.dot(ob)/(1.0*ob.dot(ob)))*ob
+		oB.append(b - x)
+	return np.array(oB)
+
+def LLL(B,delta = 3./4):
+	oB = gram_schmidt(B)
+	mu = B.dot(oB.T)/(np.sum(oB*oB,axis=-1))
+	n = B.shape[0]
+	k=1
+	while k<n:
+		j = k-1
+		while j>=0:
+			if np.abs(mu[k][j]) > 0.5:
+				B[k] = B[k] - round(mu[k][j])*B[j]
+				oB = gram_schmidt(B)
+				mu = B.dot(oB.T)/(np.sum(oB*oB,axis=-1))
+			j-=1
+		if oB[k].dot(oB[k]) >= (delta - mu[k][k-1])*oB[k].dot(oB[k]):
+			k+=1
+		else:
+			B[k],B[k-1] = B[k-1],B[k]
+			oB = gram_schmidt(B)
+			mu = B.dot(oB.T)/(np.sum(oB*oB,axis=-1))
+			k = max(k-1,1)
+	return B			
+
+
+
 
 # Number of timesteps
 ts = 1000000
-t = 100000
+t = 10000
+
+#Load from file
+A =[]
+O =[]
+model_file_name = "model-observation-ABC.txt"
+model_file = open(model_file_name, 'r')
+St = int(model_file.readline().strip())
+Sx = int(model_file.readline().strip())
+for i in xrange(St):
+	line = model_file.readline()
+	A.append(list(map(int, line.strip().split(','))))
+
+Sr = int(model_file.readline().strip())
+for i in xrange(Sr):
+	line = model_file.readline()
+	O.append(list(map(int, line.strip().split(','))))
+
+line = model_file.readline()
+print line
+X_init = list(map(float, line.strip().split(',')))
 
 A = np.array(A)
 O = np.array(O)
-X_init = np.array(X_init)
+X_init = 1.0*np.array(X_init)/np.sum(X_init)
+X = X_init/np.sum(X_init)
 Ok = KerIntBasis(O).T
-Ok = Ok*2.0/np.max(np.abs(Ok)) 
 Ak = KerIntBasis(A).T
 
 # Randomly initialize parameters
 theta = np.random.uniform(0.01,1,A.shape[0])
-# theta = 1.0*np.ones(A.shape[0])
-
-if X_init is None:
-	B = np.linalg.pinv(O)
-	X =  B.dot(u) # TODO: Add a vector from the nullspace and make sure X is positive
-else:
-	# Makes sure sum of X is 1
-	X = 1.0*X_init/sum(X_init)
-
+# Calcumating u
 u = O.dot(X)
+
 print "Design Matrix:"
 print A
 
@@ -73,7 +109,7 @@ print theta, X
 
 print "u (equals OX_init):"
 print u
-
+Ok = Ok*1.4/np.max(np.abs(Ok)) 
 reactions =[]
 rates =[]
 Y_init = np.concatenate((theta,X))
@@ -121,7 +157,7 @@ print "Each time step is:",str(delta_time)+"s"
 print "Gradient treshold:", eps
 start = default_timer()
 # output,t = system.run_till(delta_time=delta_time,eps=eps,every=100)
-output = system.run(t=1000,ts=100000)
+output = system.run(t=t,ts=ts)
 # output = system.run()
 stop = default_timer()
 Y = system.current_concentrations()
@@ -154,11 +190,3 @@ print system.dydt()
 print "Final Lyapunov"
 print Lyapunov(X,MLD)
 print "Mass Action Kinetics Took:", str(stop-start) +"s"
-# t = np.linspace(0, t, ts)
-# lyapunov = [Lyapunov(arraypow(y[:St],A),y[St:]) for y in output]
-# plt.plot(t, lyapunov, label="Lyapunov Function")
-# plt.legend(loc='best')
-# plt.xlabel('t')
-# plt.grid()
-# plt.show()
-
