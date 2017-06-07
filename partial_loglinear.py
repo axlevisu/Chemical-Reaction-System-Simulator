@@ -6,6 +6,7 @@ from fractions import Fraction
 from CRN.ReactionSystem import MassActionSystem, arraypow
 from timeit import default_timer
 from RBM.RBM import RBM
+from LLL import basis_reduce
 random_seed =6
 np.random.seed(random_seed)
 
@@ -21,40 +22,6 @@ def KerIntBasis(B):
 		Bk.append(basis)	
 	Bk = np.array(Bk).T #Basis are column elements
 	return Bk
-
-def gram_schmidt(B):
-	oB = [B[0]]
-	for b in B[1:]:
-		x = 0
-		for ob in oB:
-			x += (b.dot(ob)/(1.0*ob.dot(ob)))*ob
-		oB.append(b - x)
-	return np.array(oB)
-
-def LLL(B,delta = 3./4):
-	oB = gram_schmidt(B)
-	mu = B.dot(oB.T)/(np.sum(oB*oB,axis=-1))
-	n = B.shape[0]
-	k=1
-	while k<n:
-		j = k-1
-		while j>=0:
-			if np.abs(mu[k][j]) > 0.5:
-				B[k] = B[k] - round(mu[k][j])*B[j]
-				oB = gram_schmidt(B)
-				mu = B.dot(oB.T)/(np.sum(oB*oB,axis=-1))
-			j-=1
-		if oB[k].dot(oB[k]) >= (delta - mu[k][k-1])*oB[k].dot(oB[k]):
-			k+=1
-		else:
-			B[k],B[k-1] = B[k-1],B[k]
-			oB = gram_schmidt(B)
-			mu = B.dot(oB.T)/(np.sum(oB*oB,axis=-1))
-			k = max(k-1,1)
-	return B			
-
-
-
 
 # Number of timesteps
 ts = 1000000
