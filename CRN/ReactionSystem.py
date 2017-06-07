@@ -40,9 +40,19 @@ class ReactionSystem(object):
 			left_complex =""
 			right_complex=""
 			for j in xrange(len(S)):
-				left_complex+= " " + str(l[j]) +S[j] + " +"
-				right_complex+=" " + str(r[j]) +S[j] + " +"
-			reaction = left_complex[:-1] + " ------> " + right_complex[:-1] + "rate: "+ str(self.rates[i]) + "\n\n"
+				if (l==0).all():
+					left_complex ="0 "
+
+				if (r==0).all():
+					right_complex ="0 "
+				
+				if l[j]:
+					left_complex+= " " + str(l[j]) +"("+S[j]+")" + " +"
+				
+				if r[j]:
+					right_complex+=" " + str(r[j]) +"("+S[j]+")" + " +"
+			
+			reaction = left_complex[:-1] + " ------> " + right_complex[:-1] + "  rate: "+ str(self.rates[i]) + "\n\n"
 			reaction_set +=reaction 
 		return reaction_set[:-1]
 
