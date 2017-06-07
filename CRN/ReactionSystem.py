@@ -35,7 +35,7 @@ class ReactionSystem(object):
 		reaction_set =""
 		for i in xrange(self.reactions.shape[0]):
 			l = self.reactions[i][0]
-			r = self.reactions[i][0]
+			r = self.reactions[i][1]
 			S = self.species
 			left_complex =""
 			right_complex=""
@@ -194,7 +194,7 @@ def main():
 	print system.current_concentrations()
 	print system.dydt()
 	system = StochasticSystem(reactions,rates)
-	population = [10,10]
+	population = [10,0]
 	system.set_population(population)
 	t,o = system.run(10,plot=True)
 	return
