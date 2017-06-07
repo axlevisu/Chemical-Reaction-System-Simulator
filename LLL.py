@@ -9,7 +9,7 @@ def gram_schmidt(B):
 		oB.append(b - x)
 	return np.array(oB)
 
-def reduce(C,delta = 3./4):
+def basis_reduce(C,delta = 3./4):
 	B = C
 	oB = gram_schmidt(B)
 	mu = B.dot(oB.T)/(np.sum(oB*oB,axis=-1))

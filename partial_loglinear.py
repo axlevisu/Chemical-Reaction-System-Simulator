@@ -51,9 +51,11 @@ A = np.array(A)
 O = np.array(O)
 X_init = 1.0*np.array(X_init)/np.sum(X_init)
 X = X_init/np.sum(X_init)
+print "Before LLL"
 Ok = KerIntBasis(O).T
 Ak = KerIntBasis(A).T
-
+print Ok
+Ok =basis_reduce(Ok)
 # Randomly initialize parameters
 theta = np.random.uniform(0.01,1,A.shape[0])
 # Calcumating u
@@ -76,7 +78,7 @@ print theta, X
 
 print "u (equals OX_init):"
 print u
-Ok = Ok*1.4/np.max(np.abs(Ok)) 
+Ok = Ok*1./np.max(np.abs(Ok)) 
 reactions =[]
 rates =[]
 Y_init = np.concatenate((theta,X))
