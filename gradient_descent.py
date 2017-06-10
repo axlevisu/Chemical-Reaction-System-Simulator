@@ -28,13 +28,15 @@ def arraypow(x,A):
 
 def partial_gradient(theta,X,A,Ok):
 	Y = arraypow(theta,A)
+	Z = np.sum(Y)
+	Y = Y/Z
 	gt = -(A.dot(X - Y))/theta
-	gX = (Ok.dot(np.log(X/Y))).dot(Ok)
+	gX = (Ok.dot(1. +np.log((X)/Y))).dot(Ok)
 	return gt,gX
 
 # Give Model Here
 A = [[2,1,0],[0,1,2]]
-O = [[7,10,2],[1,1,1]]
+O = [[7,13,5],[1,1,1]]
 X_init = [0.1,0.7,0.2]
 # A = [[0,0,0,0,1,1,1,1],[0,0,1,1,0,0,1,1],[0,1,0,1,0,1,0,1],[0,0,0,0,0,0,1,1],[0,0,0,1,0,0,0,1],[5,4,4,2,4,3,2,0]]
 # O = [[1,0,1,0,0,0,0,0],[0,1,0,1,0,0,0,0],[0,0,0,0,1,0,1,0],[0,0,0,0,0,1,0,1]]
@@ -73,7 +75,7 @@ print u
 al= 0.0001
 # Niter = 100000
 lamda =1
-eps = 10**(-12)
+eps = 10**(-9)
 print "Learning Rate:",al
 print "Gradient treshold:", eps
 Niter =0
@@ -82,8 +84,8 @@ max_iter =100000
 # while(True):
 for i in xrange(max_iter):
 	gt,gX = partial_gradient(theta,X,A,Ok)
-	# if (np.abs(gt)<eps).all() and (np.abs(gX)<eps).all():
-	# 	break
+	if (np.abs(gt)<eps).all() and (np.abs(gX)<eps).all():
+		break
 	theta = theta -al*gt
 	X = X-al*gX
 	Niter +=1

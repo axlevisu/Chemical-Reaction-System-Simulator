@@ -24,8 +24,8 @@ def KerIntBasis(B):
 	return Bk
 
 # Number of timesteps
-ts = 1000000
-t = 10000
+ts = 2	0000000
+t =  1000000
 
 #Load from file
 A =[]
@@ -78,7 +78,7 @@ print theta, X
 
 print "u (equals OX_init):"
 print u
-Ok = Ok*1./np.max(np.abs(Ok)) 
+# Ok = Ok*1./np.max(np.abs(Ok)) 
 reactions =[]
 rates =[]
 Y_init = np.concatenate((theta,X))

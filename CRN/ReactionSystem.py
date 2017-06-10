@@ -103,6 +103,7 @@ class MassActionSystem(ReactionSystem):
 				plt.plot(t_index, output[:, i], label=label)
 			plt.legend(loc='best')
 			plt.xlabel('t')
+			plt.title('Concentration Profile')
 			plt.grid()
 			plt.show()
 		return output
@@ -161,6 +162,9 @@ class StochasticSystem(ReactionSystem):
 				 population.shape[0], "!=", self.reactions.shape[1]
 			return self.population
 
+		def current_population(self):
+			return self.population
+
 		def run(self, t,seed=None,plot=False):
 			"""
 			Gillespie Implementation
@@ -190,22 +194,47 @@ class StochasticSystem(ReactionSystem):
 					plt.plot(times, output[:, i], label=label)
 				plt.legend(loc='best')
 				plt.xlabel('t')
+				plt.title('Population Profile')
 				plt.grid()
 				plt.show()
 			return times,output
 
 
+# def main():
+# 	reactions = [[[1,0],[0,1]], [[0,1],[1,0]]]
+# 	rates = [1,1]
+# 	system = MassActionSystem(reactions,rates)
+# 	system.set_concentrations([2.,4.])
+# 	system.run()
+# 	print system.current_concentrations()
+# 	print system.dydt()
+# 	system = StochasticSystem(reactions,rates)
+# 	population = [10,0]
+# 	system.set_population(population)
+# 	t,o = system.run(10,plot=True)
+# 	return
+
 def main():
-	reactions = [[[1,0],[0,1]], [[0,1],[1,0]]]
+	reactions = [[[1,0,1],[0,2,0]], [[0,2,0],[1,0,1]]]
 	rates = [1,1]
 	system = MassActionSystem(reactions,rates)
-	system.set_concentrations([2.,4.])
-	system.run()
-	print system.current_concentrations()
-	print system.dydt()
+	print "Reactions:"    
+	print system.display_reactions()    
+	system.set_concentrations([-0.1 + 1/3.,0.2 + 1/3.,-0.1 + 1/3.])
+	print "Initial Concentrations:",system.current_concentrations()    
+	system.run(t=10,ts=1000,plot=True)
+	print "Final Concentrations:",system.current_concentrations()
+	print "Final concentration change rates:", system.dydt()
+
+	# Simulating Stochastic System
+	reactions = [[[1,0],[0,1]], [[0,1],[1,0]]]
+	rates = [1,1]
 	system = StochasticSystem(reactions,rates)
-	population = [10,0]
+	print "Reactions:"    
+	print system.display_reactions()
+	population = [15,0]
 	system.set_population(population)
+	print "Initial Population:",system.current_population()  
 	t,o = system.run(10,plot=True)
 	return
 
