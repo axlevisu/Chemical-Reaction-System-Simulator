@@ -3,6 +3,7 @@ import numpy as np
 from scipy.integrate import odeint
 from scipy.special import comb,factorial
 import matplotlib.pyplot as plt
+import matplotlib
 
 def arraypow(x,A):
 	#Computes(\ theta^A)
@@ -93,6 +94,7 @@ class MassActionSystem(ReactionSystem):
 		Outputs the concentration profile for the run
 		default values are 100000 and 1000000
 		"""	
+		matplotlib.rcParams.update({'font.size': 24})
 		t_index = np.linspace(0, t, ts)
 		y = self.concentrations
 		output = odeint(odes, y, t_index, args= (self.reactions,self.rates))
@@ -100,10 +102,10 @@ class MassActionSystem(ReactionSystem):
 		if plot:
 			for i in xrange(output.shape[1]):
 				label = self.species[i]
-				plt.plot(t_index, output[:, i], label=label)
+				plt.plot(t_index, output[:, i], label=r'$' + label + '$')
 			plt.legend(loc='best')
-			plt.xlabel('t')
-			plt.title('Concentration Profile')
+			plt.xlabel('Time (t)')
+			plt.ylabel('Concentration')
 			plt.grid()
 			plt.show()
 		return output
@@ -191,7 +193,7 @@ class StochasticSystem(ReactionSystem):
 			if plot:
 				for i in xrange(output.shape[1]):
 					label = self.species[i]
-					plt.plot(times, output[:, i], label=label)
+					plt.plot(times, output[:, i], label=r"$\\"+label)
 				plt.legend(loc='best')
 				plt.xlabel('t')
 				plt.title('Population Profile')

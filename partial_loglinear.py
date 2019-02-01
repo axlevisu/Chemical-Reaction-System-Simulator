@@ -24,13 +24,13 @@ def KerIntBasis(B):
 	return Bk
 
 # Number of timesteps
-ts = 20000000
-t =  1000000
+ts = 2000
+t =  0.8
 
 #Load from file
 A =[]
 O =[]
-model_file_name = "model-observation-ABC.txt"
+model_file_name = "model-observation.txt"
 model_file = open(model_file_name, 'r')
 St = int(model_file.readline().strip())
 Sx = int(model_file.readline().strip())
@@ -49,8 +49,10 @@ X_init = list(map(float, line.strip().split(',')))
 
 A = np.array(A)
 O = np.array(O)
-X_init = 1.0*np.array(X_init)/np.sum(X_init)
-X = X_init/np.sum(X_init)
+# X_init = 1.0*np.array(X_init)/np.sum(X_init)
+X_init = 1.0*np.array(X_init)
+# X = X_init/np.sum(X_init)
+X = X_init
 print "Before LLL"
 Ok = KerIntBasis(O).T
 Ak = KerIntBasis(A).T
@@ -58,6 +60,7 @@ print Ok
 Ok =basis_reduce(Ok)
 # Randomly initialize parameters
 theta = np.random.uniform(0.01,1,A.shape[0])
+theta = np.ones(A.shape[0])
 # Calcumating u
 u = O.dot(X)
 
@@ -108,7 +111,7 @@ for i in xrange(Ok.shape[0]):
 	rates = rates +[1.,1.]
 
 for i in xrange(A.shape[0]):
-	species.append("t_"+str(i+1))
+	species.append("\\theta_"+str(i+1))
 
 for i in xrange(O.shape[1]):
 	species.append("X_"+str(i+1))
@@ -126,7 +129,7 @@ print "Each time step is:",str(delta_time)+"s"
 print "Gradient treshold:", eps
 start = default_timer()
 # output,t = system.run_till(delta_time=delta_time,eps=eps,every=100)
-output = system.run(t=t,ts=ts)
+output = system.run(t=t,ts=ts, plot=True)
 # output = system.run()
 stop = default_timer()
 Y = system.current_concentrations()
