@@ -82,11 +82,23 @@ class MassActionSystem(ReactionSystem):
 		"""
 		return odes(self.concentrations,0,self.reactions,self.rates)
 
+	def dydt_profile(self):
+		"""
+		Returns rates of concentrations change profile
+		"""
+		return np.array(map(lambda f: odes(f,0,self.reactions,self.rates), self.output))
+
 	def current_concentrations(self):
 		"""
 		Returns the concentrations after the latest run
 		"""
 		return self.concentrations
+
+	def concentrations_profile(self):
+		"""
+		Returns the concentrations profile
+		"""
+		return self.output
 
 	def run(self,t=1000,ts=100000,plot=False):
 		"""
@@ -98,6 +110,7 @@ class MassActionSystem(ReactionSystem):
 		t_index = np.linspace(0, t, ts)
 		y = self.concentrations
 		output = odeint(odes, y, t_index, args= (self.reactions,self.rates))
+		self.output = output[:,:]
 		self.concentrations = output[-1,:]
 		if plot:
 			for i in xrange(output.shape[1]):
