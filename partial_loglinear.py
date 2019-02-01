@@ -24,8 +24,8 @@ def KerIntBasis(B):
 	return Bk
 
 # Number of timesteps
-ts = 2000
-t =  0.8
+ts = 20000
+t =  25
 
 #Load from file
 A =[]
