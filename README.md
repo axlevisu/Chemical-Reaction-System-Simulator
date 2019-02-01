@@ -6,7 +6,7 @@ Simulates Chemical Reaction System
 **X_init**: This is the initial concentration of reaction <br/>
 ## Running the code 
 Make suitable changes in "main.py" and then run the following command on terminal <br/>
-`Run python main.py`<br/>
+Run `python main.py`<br/>
 
 ### Sample Plot generated
 
