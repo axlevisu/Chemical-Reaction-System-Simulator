@@ -202,20 +202,6 @@ class StochasticSystem(ReactionSystem):
 			return times,output
 
 
-# def main():
-# 	reactions = [[[1,0],[0,1]], [[0,1],[1,0]]]
-# 	rates = [1,1]
-# 	system = MassActionSystem(reactions,rates)
-# 	system.set_concentrations([2.,4.])
-# 	system.run()
-# 	print system.current_concentrations()
-# 	print system.dydt()
-# 	system = StochasticSystem(reactions,rates)
-# 	population = [10,0]
-# 	system.set_population(population)
-# 	t,o = system.run(10,plot=True)
-# 	return
-
 def main():
 	reactions = [[[1,0,1],[0,2,0]], [[0,2,0],[1,0,1]]]
 	rates = [1,1]
